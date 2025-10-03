@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pagamento Não Aprovado - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .failure-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .failure-animation {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        animation: failurePulse 2s ease-in-out infinite;
+        box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+    }
+    
+    .failure-animation i {
+        color: white;
+        font-size: 3rem;
+        animation: shake 1s ease-in-out 0.5s both;
+    }
+    
+    @keyframes failurePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    .failure-title {
+        color: #dc3545;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        animation: slideInDown 1s ease-out;
+    }
+    
+    .failure-message {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        animation: slideInUp 1s ease-out 0.3s both;
+    }
+    
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .order-info {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        animation: fadeInUp 1s ease-out 0.6s both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .order-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+        font-family: monospace;
+    }
+    
+    .failure-reasons {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    
+    .failure-reasons h6 {
+        color: #856404;
+        margin-bottom: 15px;
+    }
+    
+    .reason-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        color: #856404;
+    }
+    
+    .reason-item i {
+        margin-right: 10px;
+        margin-top: 2px;
+        width: 16px;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        animation: slideInUp 1s ease-out 0.9s both;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(45deg, #dc3545, #c82333);
+        border: none;
+        padding: 12px 25px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger:hover {
+        background: linear-gradient(45deg, #c82333, #bd2130);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        padding: 10px 25px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .help-section {
+        background: #e3f2fd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 30px;
+        animation: fadeIn 1s ease-out 1.2s both;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .help-section h6 {
+        color: #1976d2;
+        margin-bottom: 15px;
+    }
+    
+    .contact-info {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+    
+    .contact-item {
+        display: flex;
+        align-items: center;
+        color: #1976d2;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-item:hover {
+        color: #0d47a1;
+        transform: translateY(-2px);
+    }
+    
+    .contact-item i {
+        margin-right: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        .failure-container {
+            padding: 20px 10px;
+        }
+        
+        .failure-title {
+            font-size: 2rem;
+        }
+        
+        .failure-message {
+            font-size: 1.1rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+        
+        .actions .btn {
+            width: 100%;
+        }
+        
+        .contact-info {
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="failure-container">
+    <div class="failure-animation">
+        <i class="fas fa-times"></i>
+    </div>
+    
+    <h1 class="failure-title">Pagamento Não Aprovado</h1>
+    
+    <p class="failure-message">
+        Infelizmente, não foi possível processar seu pagamento neste momento.
+        Não se preocupe, seu pedido foi salvo e você pode tentar novamente.
+    </p>
+    
+    <div class="order-info">
+        <div class="order-number">
+            Pedido #{{ order.order_number }}
+        </div>
+        <p class="text-muted">
+            Total: <strong>R$ {{ order.total|floatformat:2 }}</strong>
+        </p>
+    </div>
+    
+    <div class="failure-reasons">
+        <h6>
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Possíveis motivos:
+        </h6>
+        
+        <div class="reason-item">
+            <i class="fas fa-credit-card"></i>
+            <span>Dados do cartão incorretos ou cartão vencido</span>
+        </div>
+        
+        <div class="reason-item">
+            <i class="fas fa-ban"></i>
+            <span>Limite insuficiente ou cartão bloqueado</span>
+        </div>
+        
+        <div class="reason-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Transação bloqueada pelo banco por segurança</span>
+        </div>
+        
+        <div class="reason-item">
+            <i class="fas fa-wifi"></i>
+            <span>Problema temporário de conexão</span>
+        </div>
+    </div>
+    
+    <div class="actions">
+        <a href="{% url 'orders:payment' order_id=order.id %}" 
+           class="btn btn-danger">
+            <i class="fas fa-redo me-2"></i>
+            Tentar Novamente
+        </a>
+        
+        <a href="{% url 'cart:cart_detail' %}" 
+           class="btn btn-outline-secondary">
+            <i class="fas fa-shopping-cart me-2"></i>
+            Voltar ao Carrinho
+        </a>
+    </div>
+    
+    <div class="help-section">
+        <h6>
+            <i class="fas fa-question-circle me-2"></i>
+            Precisa de ajuda?
+        </h6>
+        
+        <p class="text-muted mb-3">
+            Nossa equipe está pronta para ajudá-lo a finalizar sua compra.
+        </p>
+        
+        <div class="contact-info">
+            <a href="mailto:suporte@loja.com" class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>suporte@loja.com</span>
+            </a>
+            
+            <a href="tel:+5511999999999" class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>(11) 99999-9999</span>
+            </a>
+            
+            <a href="https://wa.me/5511999999999" class="contact-item" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+                <span>WhatsApp</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll suave para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Adicionar evento de clique para tentar novamente
+    const retryBtn = document.querySelector('.btn-danger');
+    if (retryBtn) {
+        retryBtn.addEventListener('click', function(e) {
+            // Adicionar um pequeno delay para melhor UX
+            e.preventDefault();
+            
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecionando...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 1000);
+        });
+    }
+});
+</script>
+{% endblock %}

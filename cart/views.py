@@ -109,7 +109,7 @@ def cart_update(request, product_id):
         messages.error(request, 'Estoque insuficiente para este produto.')
         return redirect('cart:cart_detail')
     
-    cart.add(product, quantity=quantity, update_quantity=True)
+    cart.add(product, quantity=quantity, override_quantity=True)
     
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return JsonResponse({

@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes do Pedido #{{ order.order_number }} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-detail-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .order-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .order-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .order-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .order-date {
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .status-badges {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+    }
+    
+    .info-section {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f8f9fa;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 10px;
+        color: #007bff;
+    }
+    
+    .order-item {
+        display: flex;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .item-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 20px;
+    }
+    
+    .item-details {
+        flex: 1;
+    }
+    
+    .item-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .item-sku {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .item-quantity {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .item-price {
+        text-align: right;
+    }
+    
+    .unit-price {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .total-price {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #007bff;
+    }
+    
+    .address-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .address-name {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .address-details {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .payment-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .payment-method {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .payment-status {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .payment-completed { background: #d4edda; color: #155724; }
+    .payment-pending { background: #fff3cd; color: #856404; }
+    .payment-failed { background: #f8d7da; color: #721c24; }
+    .payment-processing { background: #cce5ff; color: #004085; }
+    
+    .order-summary {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+    }
+    
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: #666;
+    }
+    
+    .summary-line.total {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #007bff;
+        border-top: 2px solid #007bff;
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+    
+    .order-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .tracking-info {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .tracking-number {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 10px;
+        font-family: monospace;
+    }
+    
+    @media (max-width: 768px) {
+        .order-detail-container {
+            padding: 10px;
+        }
+        
+        .order-header {
+            padding: 20px;
+        }
+        
+        .order-number {
+            font-size: 1.5rem;
+        }
+        
+        .status-badges {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .order-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .item-image {
+            margin-bottom: 15px;
+        }
+        
+        .item-price {
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .payment-info {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .order-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-detail-container">
+    <!-- Cabeçalho do Pedido -->
+    <div class="order-header">
+        <div class="order-number">Pedido #{{ order.order_number }}</div>
+        <div class="order-date">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Realizado em {{ order.created_at|date:"d/m/Y à\s H:i" }}
+        </div>
+        
+        <div class="status-badges">
+            <div class="status-badge">
+                <i class="fas fa-box me-2"></i>
+                {{ order.get_status_display }}
+            </div>
+            <div class="status-badge">
+                <i class="fas fa-credit-card me-2"></i>
+                {{ order.get_payment_status_display }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informações do Cliente -->
+    <div class="info-section">
+        <h3 class="section-title">
+            <i class="fas fa-user"></i>
+            Informações do Cliente
+        </h3>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="address-info">
+                    <div class="address-name">{{ order.full_name }}</div>
+                    <div class="address-details">
+                        <i class="fas fa-envelope me-2"></i>{{ order.email }}<br>
+                        {% if order.phone %}
+                            <i class="fas fa-phone me-2"></i>{{ order.phone }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mt-3 mt-md-0">
+                <div class="address-info">
+                    <div class="address-name">
+                        <i class="fas fa-shipping-fast me-2"></i>
+                        Endereço de Entrega
+                    </div>
+                    <div class="address-details">
+                        {{ order.shipping_address }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Itens do Pedido -->
+    <div class="info-section">
+        <h3 class="section-title">
+            <i class="fas fa-shopping-bag"></i>
+            Itens do Pedido ({{ order.get_total_items }})
+        </h3>
+        
+        {% for item in order.items.all %}
+        <div class="order-item">
+            {% if item.product.images.first %}
+                <img src="{{ item.product.images.first.image.url }}" 
+                     alt="{{ item.product_name }}" class="item-image">
+            {% else %}
+                <div class="item-image bg-light d-flex align-items-center justify-content-center">
+                    <i class="fas fa-image text-muted"></i>
+                </div>
+            {% endif %}
+            
+            <div class="item-details">
+                <div class="item-name">{{ item.product_name }}</div>
+                {% if item.product_sku %}
+                    <div class="item-sku">SKU: {{ item.product_sku }}</div>
+                {% endif %}
+                <div class="item-quantity">Quantidade: {{ item.quantity }}</div>
+            </div>
+            
+            <div class="item-price">
+                <div class="unit-price">R$ {{ item.unit_price|floatformat:2 }} cada</div>
+                <div class="total-price">R$ {{ item.total_price|floatformat:2 }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Informações de Pagamento -->
+    <div class="info-section">
+        <h3 class="section-title">
+            <i class="fas fa-credit-card"></i>
+            Pagamento
+        </h3>
+        
+        {% for payment in order.payments.all %}
+        <div class="payment-info">
+            <div class="payment-method">
+                <i class="fas fa-credit-card"></i>
+                <span>{{ payment.get_payment_method_display }}</span>
+            </div>
+            <div class="payment-status payment-{{ payment.status }}">
+                {{ payment.get_status_display }}
+            </div>
+        </div>
+        {% empty %}
+        <div class="payment-info">
+            <div class="payment-method">
+                <i class="fas fa-clock"></i>
+                <span>Aguardando pagamento</span>
+            </div>
+            <div class="payment-status payment-pending">
+                Pendente
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Rastreamento -->
+    {% if order.tracking_number %}
+    <div class="info-section">
+        <h3 class="section-title">
+            <i class="fas fa-truck"></i>
+            Rastreamento
+        </h3>
+        
+        <div class="tracking-info">
+            <div>
+                <i class="fas fa-shipping-fast fa-2x mb-3"></i>
+                <div>Seu pedido foi enviado via {{ order.shipping_method }}</div>
+                <div class="tracking-number">{{ order.tracking_number }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Resumo Financeiro -->
+    <div class="info-section">
+        <h3 class="section-title">
+            <i class="fas fa-calculator"></i>
+            Resumo Financeiro
+        </h3>
+        
+        <div class="order-summary">
+            <div class="summary-line">
+                <span>Subtotal:</span>
+                <span>R$ {{ order.subtotal|floatformat:2 }}</span>
+            </div>
+            
+            {% if order.shipping_cost > 0 %}
+            <div class="summary-line">
+                <span>Frete:</span>
+                <span>R$ {{ order.shipping_cost|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+            
+            {% if order.tax_amount > 0 %}
+            <div class="summary-line">
+                <span>Impostos:</span>
+                <span>R$ {{ order.tax_amount|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+            
+            {% if order.discount_amount > 0 %}
+            <div class="summary-line">
+                <span>Desconto:</span>
+                <span>-R$ {{ order.discount_amount|floatformat:2 }}</span>
+            </div>
+            {% endif %}
+            
+            <div class="summary-line total">
+                <span>Total:</span>
+                <span>R$ {{ order.total|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ações -->
+    <div class="order-actions">
+        <a href="{% url 'orders:order_list' %}" class="btn btn-outline-secondary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar aos Pedidos
+        </a>
+        
+        {% if order.can_be_cancelled %}
+        <a href="{% url 'orders:cancel_order' order_id=order.id %}" 
+           class="btn btn-outline-danger btn-lg">
+            <i class="fas fa-times me-2"></i>
+            Cancelar Pedido
+        </a>
+        {% endif %}
+        
+        {% if order.payment_status == 'pending' %}
+        <a href="{% url 'orders:payment' order_id=order.id %}" 
+           class="btn btn-primary btn-lg">
+            <i class="fas fa-credit-card me-2"></i>
+            Pagar Agora
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação de entrada
+    const sections = document.querySelectorAll('.info-section');
+    
+    sections.forEach((section, index) => {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+});
+</script>
+{% endblock %}

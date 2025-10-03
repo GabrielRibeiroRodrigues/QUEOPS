@@ -49,7 +49,7 @@ class ProductListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.filter(is_active=True).annotate(
-            product_count=Count('products', filter=Q(products__is_active=True))
+            active_product_count=Count('products', filter=Q(products__is_active=True))
         )
         
         # Obter range de preços para filtros

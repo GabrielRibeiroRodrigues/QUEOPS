@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pagamento Processando - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pending-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .pending-animation {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffc107, #fd7e14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        animation: pendingPulse 2s ease-in-out infinite;
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3);
+    }
+    
+    .pending-animation i {
+        color: white;
+        font-size: 3rem;
+        animation: spin 2s linear infinite;
+    }
+    
+    @keyframes pendingPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .pending-title {
+        color: #ffc107;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        animation: slideInDown 1s ease-out;
+    }
+    
+    .pending-message {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        animation: slideInUp 1s ease-out 0.3s both;
+    }
+    
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .order-info {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 30px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        animation: fadeInUp 1s ease-out 0.6s both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .order-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+        font-family: monospace;
+    }
+    
+    .status-timeline {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 25px 0;
+        text-align: left;
+    }
+    
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        position: relative;
+    }
+    
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 30px;
+        width: 2px;
+        height: 25px;
+        background: #dee2e6;
+    }
+    
+    .timeline-item:last-child::before {
+        display: none;
+    }
+    
+    .timeline-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 0.8rem;
+        z-index: 1;
+        position: relative;
+    }
+    
+    .timeline-icon.completed {
+        background: #28a745;
+        color: white;
+    }
+    
+    .timeline-icon.current {
+        background: #ffc107;
+        color: white;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .timeline-icon.pending {
+        background: #dee2e6;
+        color: #6c757d;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .timeline-content h6 {
+        margin: 0 0 5px 0;
+        color: #333;
+    }
+    
+    .timeline-content small {
+        color: #666;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        animation: slideInUp 1s ease-out 0.9s both;
+    }
+    
+    .btn-warning {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        border: none;
+        color: white;
+        padding: 12px 25px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-warning:hover {
+        background: linear-gradient(45deg, #fd7e14, #dc6200);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        padding: 10px 25px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .info-section {
+        background: #e3f2fd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 30px;
+        animation: fadeIn 1s ease-out 1.2s both;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .info-section h6 {
+        color: #1976d2;
+        margin-bottom: 15px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        color: #666;
+    }
+    
+    .info-item i {
+        color: #1976d2;
+        margin-right: 10px;
+        width: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .pending-container {
+            padding: 20px 10px;
+        }
+        
+        .pending-title {
+            font-size: 2rem;
+        }
+        
+        .pending-message {
+            font-size: 1.1rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+        
+        .actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pending-container">
+    <div class="pending-animation">
+        <i class="fas fa-clock"></i>
+    </div>
+    
+    <h1 class="pending-title">Pagamento em Processamento</h1>
+    
+    <p class="pending-message">
+        Seu pagamento está sendo processado. Isso pode levar alguns minutos.
+        Você será notificado assim que a confirmação for recebida.
+    </p>
+    
+    <div class="order-info">
+        <div class="order-number">
+            Pedido #{{ order.order_number }}
+        </div>
+        <p class="text-muted">
+            Total: <strong>R$ {{ order.total|floatformat:2 }}</strong>
+        </p>
+    </div>
+    
+    <div class="status-timeline">
+        <div class="timeline-item">
+            <div class="timeline-icon completed">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="timeline-content">
+                <h6>Pedido Criado</h6>
+                <small>{{ order.created_at|date:"d/m/Y à\s H:i" }}</small>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon current">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="timeline-content">
+                <h6>Processando Pagamento</h6>
+                <small>Aguardando confirmação do sistema de pagamento</small>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon pending">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="timeline-content">
+                <h6>Preparação do Pedido</h6>
+                <small>Após confirmação do pagamento</small>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-icon pending">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <div class="timeline-content">
+                <h6>Envio</h6>
+                <small>Entrega conforme método selecionado</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="actions">
+        <a href="{% url 'orders:order_detail' order_id=order.id %}" 
+           class="btn btn-warning">
+            <i class="fas fa-eye me-2"></i>
+            Acompanhar Pedido
+        </a>
+        
+        <a href="{% url 'store:product_list' %}" 
+           class="btn btn-outline-secondary">
+            <i class="fas fa-shopping-bag me-2"></i>
+            Continuar Comprando
+        </a>
+    </div>
+    
+    <div class="info-section">
+        <h6>
+            <i class="fas fa-info-circle me-2"></i>
+            Informações importantes:
+        </h6>
+        
+        <div class="info-item">
+            <i class="fas fa-envelope"></i>
+            <span>Você receberá um e-mail quando o pagamento for confirmado</span>
+        </div>
+        
+        <div class="info-item">
+            <i class="fas fa-clock"></i>
+            <span>O processamento pode levar até 24 horas</span>
+        </div>
+        
+        <div class="info-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Seus dados estão seguros e protegidos</span>
+        </div>
+        
+        <div class="info-item">
+            <i class="fas fa-phone"></i>
+            <span>Entre em contato se precisar de ajuda: (11) 99999-9999</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll suave para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Simular atualização de status (opcional)
+    let checkCount = 0;
+    const maxChecks = 12; // 12 verificações = 1 minuto
+    
+    function checkPaymentStatus() {
+        checkCount++;
+        
+        // Após algumas verificações, podemos mostrar uma mensagem
+        if (checkCount >= maxChecks) {
+            const message = document.querySelector('.pending-message');
+            if (message) {
+                message.innerHTML = `
+                    Seu pagamento ainda está sendo processado. 
+                    Isso pode levar algumas horas dependendo do método de pagamento escolhido.
+                    <br><br>
+                    <strong>Não se preocupe!</strong> Você será notificado por e-mail assim que o pagamento for confirmado.
+                `;
+            }
+            return;
+        }
+        
+        // Verificar novamente em 5 segundos
+        setTimeout(checkPaymentStatus, 5000);
+    }
+    
+    // Iniciar verificação após 10 segundos
+    setTimeout(checkPaymentStatus, 10000);
+    
+    // Auto-refresh da página a cada 2 minutos
+    setTimeout(() => {
+        window.location.reload();
+    }, 120000);
+});
+</script>
+{% endblock %}
