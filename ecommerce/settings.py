@@ -56,8 +56,8 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # Add debug toolbar for development
-if DEBUG:
-    INSTALLED_APPS += ['debug_toolbar']
+# if DEBUG:
+#     INSTALLED_APPS += ['debug_toolbar']
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -72,8 +72,8 @@ MIDDLEWARE = [
 ]
 
 # Add debug toolbar middleware for development
-if DEBUG:
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+# if DEBUG:
+#     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 ROOT_URLCONF = 'ecommerce.urls'
 
