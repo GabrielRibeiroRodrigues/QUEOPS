@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Entrar - E-commerce{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4><i class="bi bi-person-circle"></i> Entrar</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i> Usuário
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">
+                                    {{ form.username.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">
+                                <i class="bi bi-lock"></i> Senha
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small">
+                                    {{ form.password.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                            <label class="form-check-label" for="rememberMe">
+                                Lembrar de mim
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <p class="mb-2">
+                            <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none">
+                                Esqueceu sua senha?
+                            </a>
+                        </p>
+                        <p class="mb-0">
+                            Não tem uma conta? 
+                            <a href="{% url 'accounts:register' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="text-decoration-none">
+                                Cadastre-se
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informações adicionais -->
+            <div class="card mt-3">
+                <div class="card-body text-center">
+                    <h6>Vantagens de ter uma conta</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li><i class="bi bi-check-circle text-success"></i> Acompanhe seus pedidos</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Histórico de compras</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Checkout mais rápido</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Ofertas exclusivas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Adicionar classes CSS aos campos do formulário
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameField = document.getElementById('id_username');
+    const passwordField = document.getElementById('id_password');
+    
+    if (usernameField) {
+        usernameField.classList.add('form-control');
+        usernameField.setAttribute('placeholder', 'Nome de usuário ou email');
+    }
+    
+    if (passwordField) {
+        passwordField.classList.add('form-control');
+        passwordField.setAttribute('placeholder', 'Sua senha');
+    }
+});
+</script>
+{% endblock %}

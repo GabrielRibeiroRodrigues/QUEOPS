@@ -1,0 +1,703 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carrinho de Compras - FarmáciaSaúde{% endblock %}
+
+{% block meta_description %}Revise os produtos em seu carrinho de compras na FarmáciaSaúde. Medicamentos, vitaminas e produtos de saúde com entrega rápida.{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Início</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Produtos</a></li>
+            <li class="breadcrumb-item active">Carrinho</li>
+        </ol>
+    </nav>
+
+    <!-- Progress Steps -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="progress-steps">
+                <div class="step active">
+                    <div class="step-icon">
+                        <i class="bi bi-cart3"></i>
+                    </div>
+                    <span class="step-label">Carrinho</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <span class="step-label">Identificação</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <span class="step-label">Pagamento</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <span class="step-label">Confirmação</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4">
+        <i class="fas fa-shopping-cart text-primary"></i> 
+        Carrinho de Compras
+        {% if cart %}
+            <span class="badge bg-primary ms-2">{{ cart.get_item_count }} item{{ cart.get_item_count|pluralize }}</span>
+        {% endif %}
+    </h2>
+
+    {% if cart %}
+        <div class="row">
+            <!-- Itens do carrinho -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-bag"></i> 
+                                    Seus Produtos ({{ cart.get_item_count }})
+                                </h5>
+                            </div>
+                            <div class="col-auto">
+                                <small class="text-muted">Frete grátis acima de R$ 99</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for item in cart %}
+                        <div class="cart-item border-bottom p-4" data-product-id="{{ item.product.id }}">
+                            <div class="row align-items-center">
+                                <!-- Imagem do produto -->
+                                <div class="col-md-2 col-3">
+                                    {% with main_image=item.product.get_main_image %}
+                                        {% if main_image %}
+                                            <img src="{{ main_image.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ item.product.name }}" style="max-height: 100px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center shadow-sm" style="height: 100px;">
+                                                <i class="fas fa-pills fa-2x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+
+                                <!-- Informações do produto -->
+                                <div class="col-md-4 col-9">
+                                    <h6 class="mb-2 fw-bold">
+                                        <a href="{{ item.product.get_absolute_url }}" class="text-decoration-none text-dark">
+                                            {{ item.product.name }}
+                                        </a>
+                                    </h6>
+                                    <div class="mb-1">
+                                        <small class="text-muted">
+                                            <i class="bi bi-tag"></i> {{ item.product.category.name }}
+                                        </small>
+                                    </div>
+                                    {% if item.product.sku %}
+                                        <div class="mb-1">
+                                            <small class="text-muted">
+                                                <i class="bi bi-upc"></i> SKU: {{ item.product.sku }}
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Disponibilidade -->
+                                    <div class="mb-2">
+                                        {% if item.product.can_be_purchased %}
+                                            <small class="text-success">
+                                                <i class="bi bi-check-circle"></i> Disponível
+                                            </small>
+                                        {% else %}
+                                            <small class="text-danger">
+                                                <i class="bi bi-exclamation-triangle"></i> Indisponível
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Preço unitário -->
+                                <div class="col-md-2 col-6 text-center">
+                                    <div class="mb-1">
+                                        <small class="text-muted">Preço unitário</small>
+                                    </div>
+                                    <strong class="h6 text-primary">R$ {{ item.price }}</strong>
+                                </div>
+
+                                <!-- Quantidade -->
+                                <div class="col-md-2 col-6">
+                                    <div class="mb-1 text-center">
+                                        <small class="text-muted">Quantidade</small>
+                                    </div>
+                                    <form method="post" action="{% url 'cart:cart_update' item.product.id %}" class="quantity-form">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="decreaseQuantity(this)">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" 
+                                                   max="{% if item.product.track_stock %}{{ item.product.stock_quantity }}{% else %}999{% endif %}"
+                                                   class="form-control text-center quantity-input fw-bold">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="increaseQuantity(this)">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                                            <i class="bi bi-arrow-clockwise"></i> Atualizar
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Total do item -->
+                                <div class="col-md-1 col-6 text-center">
+                                    <div class="mb-1">
+                                        <small class="text-muted">Total</small>
+                                    </div>
+                                    <strong class="h6 text-success item-total">R$ {{ item.total_price }}</strong>
+                                </div>
+
+                                <!-- Remover item -->
+                                <div class="col-md-1 col-6 text-center">
+                                    <form method="post" action="{% url 'cart:cart_remove' item.product.id %}" class="remove-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Remover item" data-bs-toggle="tooltip">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Ações do carrinho -->
+                <div class="mt-4">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Continuar Comprando
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <form method="post" action="{% url 'cart:cart_clear' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-lg" onclick="return confirm('Tem certeza que deseja limpar o carrinho?')">
+                                    <i class="bi bi-trash"></i> Limpar Carrinho
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos Relacionados -->
+                <div class="mt-5">
+                    <h4 class="mb-3">Você também pode gostar</h4>
+                    <div class="row g-3">
+                        <!-- Aqui você pode adicionar produtos relacionados -->
+                        <div class="col-6 col-md-3">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body text-center p-3">
+                                    <i class="fas fa-pills fa-2x text-primary mb-2"></i>
+                                    <h6 class="card-title small">Produto Sugerido</h6>
+                                    <p class="text-primary fw-bold">R$ 29,90</p>
+                                    <button class="btn btn-sm btn-outline-primary">Ver</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo do pedido -->
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 100px;">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-calculator"></i> Resumo do Pedido
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Subtotal ({{ cart.get_item_count }} item{{ cart.get_item_count|pluralize }}):</span>
+                                <strong id="cart-subtotal">R$ {{ cart.get_total_price }}</strong>
+                            </div>
+                            
+                            <!-- Calculadora de Frete -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Calcular Frete:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="00000-000" id="cep-input" maxlength="9">
+                                    <button class="btn btn-outline-primary" type="button" onclick="calculateShipping()">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                                <div id="shipping-result" class="mt-2"></div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Frete:</span>
+                                <span class="text-muted" id="shipping-cost">A calcular</span>
+                            </div>
+                            
+                            <!-- Desconto -->
+                            <div class="d-flex justify-content-between mb-3 text-success" id="discount-row" style="display: none !important;">
+                                <span>Desconto:</span>
+                                <span id="discount-amount">- R$ 0,00</span>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="d-flex justify-content-between mb-4">
+                                <strong class="h5">Total:</strong>
+                                <strong class="text-primary h4" id="cart-total">R$ {{ cart.get_total_price }}</strong>
+                            </div>
+
+                            <div class="d-grid gap-3">
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'orders:order_create' %}" class="btn btn-success btn-lg">
+                                        <i class="bi bi-credit-card"></i> Finalizar Compra
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'accounts:login' %}?next={% url 'orders:order_create' %}" class="btn btn-success btn-lg">
+                                        <i class="bi bi-person"></i> Entrar para Finalizar
+                                    </a>
+                                    <div class="text-center">
+                                        <small class="text-muted">
+                                            Não tem conta? <a href="{% url 'accounts:register' %}" class="text-decoration-none">Cadastre-se aqui</a>
+                                        </small>
+                                    </div>
+                                {% endif %}
+                                
+                                <button class="btn btn-outline-primary" onclick="saveForLater()">
+                                    <i class="bi bi-bookmark"></i> Salvar para Depois
+                                </button>
+                            </div>
+
+                            <!-- Informações de Segurança -->
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-shield-check text-success"></i> Compra Segura
+                                </h6>
+                                <div class="small text-muted">
+                                    <div class="mb-1">
+                                        <i class="bi bi-truck"></i> Frete grátis acima de R$ 99
+                                    </div>
+                                    <div class="mb-1">
+                                        <i class="bi bi-arrow-clockwise"></i> 30 dias para trocas
+                                    </div>
+                                    <div class="mb-1">
+                                        <i class="bi bi-credit-card"></i> Pagamento seguro
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-award"></i> Farmacêutico responsável
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cupom de desconto -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="bi bi-tag"></i> Cupom de Desconto
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="coupon-form">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Digite seu cupom" id="coupon-code">
+                                    <button type="submit" class="btn btn-outline-primary">
+                                        <i class="bi bi-check"></i> Aplicar
+                                    </button>
+                                </div>
+                                <div id="coupon-message" class="mt-2"></div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Formas de Pagamento -->
+                    <div class="card border-0 shadow-sm mt-3">
+                        <div class="card-body text-center">
+                            <h6 class="mb-3">Formas de Pagamento</h6>
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                <i class="fab fa-cc-visa fa-2x text-primary"></i>
+                                <i class="fab fa-cc-mastercard fa-2x text-warning"></i>
+                                <i class="fab fa-cc-amex fa-2x text-info"></i>
+                                <i class="fas fa-barcode fa-2x text-dark"></i>
+                                <i class="fab fa-pix fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Carrinho vazio -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-shopping-cart display-1 text-muted"></i>
+            </div>
+            <h3 class="mb-3">Seu carrinho está vazio</h3>
+            <p class="text-muted mb-4">Que tal adicionar alguns produtos incríveis ao seu carrinho?</p>
+            
+            <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-shop"></i> Ver Produtos
+                </a>
+                <a href="{% url 'core:home' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-house"></i> Voltar ao Início
+                </a>
+            </div>
+
+            <!-- Categorias Populares -->
+            <div class="mt-5">
+                <h5 class="mb-3">Categorias Populares</h5>
+                <div class="row justify-content-center">
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-pills fa-2x text-primary mb-2"></i>
+                                    <h6>Medicamentos</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-leaf fa-2x text-success mb-2"></i>
+                                    <h6>Vitaminas</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-spa fa-2x text-info mb-2"></i>
+                                    <h6>Cosméticos</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="#" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-pump-soap fa-2x text-warning mb-2"></i>
+                                    <h6>Higiene</h6>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- CSS adicional para progress steps -->
+<style>
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.step.active .step-icon {
+    background: var(--primary-color);
+    color: white;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.step.active .step-label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.step-line {
+    width: 80px;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .step-line {
+        width: 40px;
+        margin: 0 0.5rem;
+    }
+    
+    .step-label {
+        font-size: 0.8rem;
+    }
+    
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Variáveis globais
+let isUpdating = false;
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    initializeQuantityControls();
+    initializeCEPMask();
+    initializeCouponForm();
+    initializeTooltips();
+});
+
+// Controles de quantidade
+function initializeQuantityControls() {
+    // Auto-submit form quando quantidade muda
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        let timeout;
+        input.addEventListener('input', function() {
+            if (isUpdating) return;
+            
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                updateCartItem(this);
+            }, 1000);
+        });
+    });
+
+    // Confirmação para remover itens
+    document.querySelectorAll('.remove-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('Tem certeza que deseja remover este item do carrinho?')) {
+                e.preventDefault();
+            }
+        });
+    });
+}
+
+// Aumentar quantidade
+function increaseQuantity(button) {
+    const input = button.parentElement.querySelector('.quantity-input');
+    const max = parseInt(input.getAttribute('max'));
+    const current = parseInt(input.value);
+    
+    if (current < max) {
+        input.value = current + 1;
+        updateCartItem(input);
+    }
+}
+
+// Diminuir quantidade
+function decreaseQuantity(button) {
+    const input = button.parentElement.querySelector('.quantity-input');
+    const current = parseInt(input.value);
+    
+    if (current > 1) {
+        input.value = current - 1;
+        updateCartItem(input);
+    }
+}
+
+// Atualizar item do carrinho
+function updateCartItem(input) {
+    if (isUpdating) return;
+    
+    isUpdating = true;
+    const form = input.closest('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Mostrar loading
+    submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Atualizando...';
+    submitBtn.disabled = true;
+    
+    // Simular atualização (em produção, usar AJAX)
+    setTimeout(() => {
+        form.submit();
+    }, 500);
+}
+
+// Máscara para CEP
+function initializeCEPMask() {
+    const cepInput = document.getElementById('cep-input');
+    if (cepInput) {
+        cepInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            this.value = value;
+        });
+    }
+}
+
+// Calcular frete
+function calculateShipping() {
+    const cep = document.getElementById('cep-input').value;
+    const resultDiv = document.getElementById('shipping-result');
+    const shippingCost = document.getElementById('shipping-cost');
+    
+    if (cep.length !== 9) {
+        resultDiv.innerHTML = '<small class="text-danger">CEP inválido</small>';
+        return;
+    }
+    
+    // Mostrar loading
+    resultDiv.innerHTML = '<small class="text-muted"><i class="spinner-border spinner-border-sm"></i> Calculando...</small>';
+    
+    // Simular cálculo de frete
+    setTimeout(() => {
+        const options = [
+            { name: 'PAC', price: 'R$ 15,90', days: '5-7 dias úteis' },
+            { name: 'SEDEX', price: 'R$ 25,90', days: '2-3 dias úteis' }
+        ];
+        
+        let html = '<div class="mt-2">';
+        options.forEach(option => {
+            html += `
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="shipping" value="${option.price}" onchange="selectShipping('${option.price}')">
+                    <label class="form-check-label small">
+                        <strong>${option.name}</strong> - ${option.price}<br>
+                        <span class="text-muted">${option.days}</span>
+                    </label>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        resultDiv.innerHTML = html;
+    }, 1500);
+}
+
+// Selecionar frete
+function selectShipping(price) {
+    document.getElementById('shipping-cost').textContent = price;
+    updateTotal();
+}
+
+// Inicializar formulário de cupom
+function initializeCouponForm() {
+    const couponForm = document.getElementById('coupon-form');
+    if (couponForm) {
+        couponForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyCoupon();
+        });
+    }
+}
+
+// Aplicar cupom
+function applyCoupon() {
+    const couponCode = document.getElementById('coupon-code').value;
+    const messageDiv = document.getElementById('coupon-message');
+    
+    if (!couponCode.trim()) {
+        messageDiv.innerHTML = '<small class="text-danger">Digite um código de cupom</small>';
+        return;
+    }
+    
+    // Mostrar loading
+    messageDiv.innerHTML = '<small class="text-muted"><i class="spinner-border spinner-border-sm"></i> Verificando...</small>';
+    
+    // Simular verificação de cupom
+    setTimeout(() => {
+        const validCoupons = ['DESCONTO10', 'BEMVINDO', 'FRETE15'];
+        
+        if (validCoupons.includes(couponCode.toUpperCase())) {
+            messageDiv.innerHTML = '<small class="text-success"><i class="bi bi-check-circle"></i> Cupom aplicado com sucesso!</small>';
+            
+            // Mostrar desconto
+            const discountRow = document.getElementById('discount-row');
+            const discountAmount = document.getElementById('discount-amount');
+            discountRow.style.display = 'flex';
+            discountAmount.textContent = '- R$ 10,00';
+            
+            updateTotal();
+        } else {
+            messageDiv.innerHTML = '<small class="text-danger"><i class="bi bi-x-circle"></i> Cupom inválido ou expirado</small>';
+        }
+    }, 1000);
+}
+
+// Atualizar total
+function updateTotal() {
+    // Em uma implementação real, isso seria calculado no backend
+    const subtotal = parseFloat(document.getElementById('cart-subtotal').textContent.replace('R$ ', '').replace(',', '.'));
+    const shipping = document.getElementById('shipping-cost').textContent;
+    const discount = document.getElementById('discount-amount').textContent;
+    
+    let total = subtotal;
+    
+    if (shipping !== 'A calcular' && shipping !== 'Grátis') {
+        total += parseFloat(shipping.replace('R$ ', '').replace(',', '.'));
+    }
+    
+    if (discount !== '- R$ 0,00') {
+        total -= parseFloat(discount.replace('- R$ ', '').replace(',', '.'));
+    }
+    
+    document.getElementById('cart-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+}
+
+// Salvar para depois
+function saveForLater() {
+    FarmaciaJS.showNotification('Carrinho salvo com sucesso!', 'success');
+}
+
+// Inicializar tooltips
+function initializeTooltips() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}
+</script>
+{% endblock %}

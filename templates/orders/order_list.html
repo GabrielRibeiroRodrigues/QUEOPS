@@ -1,0 +1,861 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meus Pedidos - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-header {
+        background: linear-gradient(135deg, #007bff, #6c5ce7);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 40px;
+    }
+    
+    .orders-stats {
+        display: flex;
+        gap: 30px;
+        margin-top: 20px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .orders-filters {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-group {
+        margin-bottom: 15px;
+    }
+    
+    .filter-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .order-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .order-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .order-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .order-info {
+        flex: 1;
+    }
+    
+    .order-number {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #007bff;
+        margin-bottom: 5px;
+    }
+    
+    .order-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .order-total {
+        font-weight: 600;
+        color: #28a745;
+        font-size: 1.1rem;
+    }
+    
+    .order-status {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-processing {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-shipped {
+        background: #cce7ff;
+        color: #004085;
+    }
+    
+    .status-delivered {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .order-body {
+        padding: 20px;
+    }
+    
+    .order-items {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    
+    .order-item {
+        display: flex;
+        align-items: center;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        flex: 1;
+        min-width: 250px;
+    }
+    
+    .item-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-right: 12px;
+    }
+    
+    .item-details {
+        flex: 1;
+    }
+    
+    .item-name {
+        font-weight: 600;
+        margin-bottom: 3px;
+        font-size: 0.9rem;
+    }
+    
+    .item-quantity {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .order-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+    }
+    
+    .btn-primary-action {
+        background: #007bff;
+        color: white;
+    }
+    
+    .btn-primary-action:hover {
+        background: #0056b3;
+        color: white;
+    }
+    
+    .btn-outline-action {
+        color: #007bff;
+        border-color: #007bff;
+        background: transparent;
+    }
+    
+    .btn-outline-action:hover {
+        background: #007bff;
+        color: white;
+    }
+    
+    .btn-secondary-action {
+        color: #6c757d;
+        border-color: #6c757d;
+        background: transparent;
+    }
+    
+    .btn-secondary-action:hover {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .empty-orders {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+    
+    .pagination-container {
+        margin-top: 40px;
+    }
+    
+    .quick-actions {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .quick-action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .quick-action {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #495057;
+        transition: all 0.3s;
+    }
+    
+    .quick-action:hover {
+        background: #e9ecef;
+        color: #007bff;
+        transform: translateY(-2px);
+    }
+    
+    .quick-action-icon {
+        font-size: 1.5rem;
+        margin-right: 12px;
+        color: #007bff;
+    }
+    
+    .quick-action-info {
+        flex: 1;
+    }
+    
+    .quick-action-title {
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+    
+    .quick-action-desc {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .order-progress {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+    
+    .progress-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .progress-bar-container {
+        background: #dee2e6;
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .progress-step.active {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .orders-header {
+            padding: 30px 0;
+        }
+        
+        .orders-stats {
+            justify-content: space-around;
+            gap: 20px;
+        }
+        
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .order-items {
+            flex-direction: column;
+        }
+        
+        .order-item {
+            min-width: auto;
+        }
+        
+        .order-actions {
+            justify-content: center;
+        }
+        
+        .quick-action-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .notification-badge {
+        position: relative;
+    }
+    
+    .notification-badge::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 10px;
+        height: 10px;
+        background: #dc3545;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="orders-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">Meus Pedidos</h1>
+                <p class="lead mb-0">Acompanhe seus pedidos e histórico de compras</p>
+            </div>
+            <div class="col-md-4">
+                <div class="orders-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_orders }}</span>
+                        <span class="stat-label">Total de Pedidos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ pending_orders }}</span>
+                        <span class="stat-label">Em Andamento</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Ações Rápidas -->
+    <div class="quick-actions">
+        <h5 class="mb-3">Ações Rápidas</h5>
+        <div class="quick-action-grid">
+            <a href="{% url 'store:product_list' %}" class="quick-action">
+                <div class="quick-action-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="quick-action-info">
+                    <div class="quick-action-title">Nova Compra</div>
+                    <div class="quick-action-desc">Explorar produtos</div>
+                </div>
+            </a>
+            
+            <a href="{% url 'cart:cart_detail' %}" class="quick-action">
+                <div class="quick-action-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="quick-action-info">
+                    <div class="quick-action-title">Meu Carrinho</div>
+                    <div class="quick-action-desc">Finalizar compra</div>
+                </div>
+            </a>
+            
+            <a href="#" class="quick-action">
+                <div class="quick-action-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="quick-action-info">
+                    <div class="quick-action-title">Lista de Desejos</div>
+                    <div class="quick-action-desc">Produtos favoritos</div>
+                </div>
+            </a>
+            
+            <a href="#" class="quick-action">
+                <div class="quick-action-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="quick-action-info">
+                    <div class="quick-action-title">Meu Perfil</div>
+                    <div class="quick-action-desc">Dados pessoais</div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="orders-filters">
+        <form method="get" id="filters-form">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="filter-group">
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" class="form-select" onchange="document.getElementById('filters-form').submit()">
+                            <option value="">Todos os Status</option>
+                            <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmado</option>
+                            <option value="processing" {% if request.GET.status == 'processing' %}selected{% endif %}>Processando</option>
+                            <option value="shipped" {% if request.GET.status == 'shipped' %}selected{% endif %}>Enviado</option>
+                            <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Entregue</option>
+                            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="filter-group">
+                        <label for="date_from" class="form-label">Data Inicial</label>
+                        <input type="date" name="date_from" id="date_from" 
+                               class="form-control" value="{{ request.GET.date_from }}"
+                               onchange="document.getElementById('filters-form').submit()">
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="filter-group">
+                        <label for="date_to" class="form-label">Data Final</label>
+                        <input type="date" name="date_to" id="date_to" 
+                               class="form-control" value="{{ request.GET.date_to }}"
+                               onchange="document.getElementById('filters-form').submit()">
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="filter-group">
+                        <label for="search" class="form-label">Buscar Pedido</label>
+                        <div class="input-group">
+                            <input type="text" name="search" id="search" 
+                                   class="form-control" placeholder="Nº do pedido ou produto"
+                                   value="{{ request.GET.search }}">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if request.GET %}
+            <div class="text-end">
+                <a href="{% url 'accounts:orders' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times me-1"></i>Limpar Filtros
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+    
+    <!-- Lista de Pedidos -->
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div class="order-info">
+                    <div class="order-number">#{{ order.order_number }}</div>
+                    <div class="order-date">{{ order.created_at|date:"d/m/Y às H:i" }}</div>
+                    <div class="order-total">R$ {{ order.total_amount|floatformat:2 }}</div>
+                </div>
+                
+                <div class="order-status-container">
+                    <span class="order-status status-{{ order.status }}">
+                        {% if order.status == 'confirmed' %}
+                            Confirmado
+                        {% elif order.status == 'processing' %}
+                            Processando
+                        {% elif order.status == 'shipped' %}
+                            Enviado
+                        {% elif order.status == 'delivered' %}
+                            Entregue
+                        {% elif order.status == 'cancelled' %}
+                            Cancelado
+                        {% else %}
+                            {{ order.get_status_display }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="order-body">
+                <!-- Itens do Pedido -->
+                <div class="order-items">
+                    {% for item in order.items.all|slice:":3" %}
+                    <div class="order-item">
+                        {% if item.product.images.all %}
+                            {% with item.product.images.all|first as image %}
+                            <img src="{{ image.image.url }}" alt="{{ item.product.name }}" class="item-image">
+                            {% endwith %}
+                        {% else %}
+                            <div class="item-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="item-details">
+                            <div class="item-name">{{ item.product.name|truncatewords:4 }}</div>
+                            <div class="item-quantity">Qtd: {{ item.quantity }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if order.items.count > 3 %}
+                    <div class="order-item">
+                        <div class="item-details text-center w-100">
+                            <div class="item-name">+{{ order.items.count|add:"-3" }} item{{ order.items.count|add:"-3"|pluralize:"s" }}</div>
+                            <div class="item-quantity">Ver todos os itens</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Progresso do Pedido -->
+                {% if order.status != 'cancelled' and order.status != 'delivered' %}
+                <div class="order-progress">
+                    <div class="progress-title">Progresso do Pedido</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 
+                            {% if order.status == 'confirmed' %}25%
+                            {% elif order.status == 'processing' %}50%
+                            {% elif order.status == 'shipped' %}75%
+                            {% elif order.status == 'delivered' %}100%
+                            {% endif %}"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <span class="progress-step {% if order.status != 'confirmed' %}active{% endif %}">Confirmado</span>
+                        <span class="progress-step {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">Processando</span>
+                        <span class="progress-step {% if order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">Enviado</span>
+                        <span class="progress-step {% if order.status == 'delivered' %}active{% endif %}">Entregue</span>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Ações do Pedido -->
+                <div class="order-actions">
+                    <a href="{% url 'orders:order_detail' order.id %}" class="btn-action btn-primary-action">
+                        <i class="fas fa-eye me-1"></i>Ver Detalhes
+                    </a>
+                    
+                    {% if order.tracking_code %}
+                    <a href="#" class="btn-action btn-outline-action notification-badge">
+                        <i class="fas fa-truck me-1"></i>Rastrear
+                    </a>
+                    {% endif %}
+                    
+                    {% if order.status == 'delivered' %}
+                    <a href="#" class="btn-action btn-outline-action">
+                        <i class="fas fa-star me-1"></i>Avaliar
+                    </a>
+                    {% endif %}
+                    
+                    {% if order.status == 'confirmed' %}
+                    <a href="#" class="btn-action btn-secondary-action" onclick="cancelOrder({{ order.id }})">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </a>
+                    {% endif %}
+                    
+                    <a href="#" class="btn-action btn-outline-action">
+                        <i class="fas fa-redo me-1"></i>Comprar Novamente
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Paginação -->
+        {% if is_paginated %}
+        <div class="pagination-container">
+            <nav aria-label="Paginação de pedidos">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <!-- Estado Vazio -->
+        <div class="empty-orders">
+            <div class="empty-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <h4 class="mb-3">Nenhum pedido encontrado</h4>
+            <p class="text-muted mb-4">
+                {% if request.GET %}
+                    Nenhum pedido corresponde aos filtros selecionados.
+                    <br>Tente ajustar os critérios de busca.
+                {% else %}
+                    Você ainda não fez nenhum pedido conosco.
+                    <br>Que tal fazer sua primeira compra?
+                {% endif %}
+            </p>
+            
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-shopping-bag me-2"></i>Fazer Compra
+                </a>
+                
+                {% if request.GET %}
+                <a href="{% url 'accounts:orders' %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>Limpar Filtros
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Cancelamento -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancelar Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja cancelar este pedido?</p>
+                <p class="text-muted small">
+                    Esta ação não pode ser desfeita. Se o pagamento já foi processado, 
+                    o valor será estornado em até 5 dias úteis.
+                </p>
+                
+                <div class="mb-3">
+                    <label for="cancel-reason" class="form-label">Motivo do cancelamento</label>
+                    <select id="cancel-reason" class="form-select">
+                        <option value="">Selecione um motivo</option>
+                        <option value="changed_mind">Mudei de ideia</option>
+                        <option value="found_better_price">Encontrei melhor preço</option>
+                        <option value="payment_issues">Problemas com pagamento</option>
+                        <option value="delivery_delay">Demora na entrega</option>
+                        <option value="other">Outro motivo</option>
+                    </select>
+                </div>
+                
+                <div id="other-reason" style="display: none;">
+                    <label for="other-reason-text" class="form-label">Especifique o motivo</label>
+                    <textarea id="other-reason-text" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Manter Pedido
+                </button>
+                <button type="button" class="btn btn-danger" id="confirm-cancel">
+                    Cancelar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let orderToCancel = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Cancel reason handler
+    const cancelReason = document.getElementById('cancel-reason');
+    const otherReason = document.getElementById('other-reason');
+    
+    if (cancelReason) {
+        cancelReason.addEventListener('change', function() {
+            if (this.value === 'other') {
+                otherReason.style.display = 'block';
+            } else {
+                otherReason.style.display = 'none';
+            }
+        });
+    }
+    
+    // Confirm cancel handler
+    const confirmCancel = document.getElementById('confirm-cancel');
+    if (confirmCancel) {
+        confirmCancel.addEventListener('click', function() {
+            if (orderToCancel) {
+                performCancelOrder(orderToCancel);
+            }
+        });
+    }
+});
+
+function cancelOrder(orderId) {
+    orderToCancel = orderId;
+    const modal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+    modal.show();
+}
+
+function performCancelOrder(orderId) {
+    const reason = document.getElementById('cancel-reason').value;
+    const otherReasonText = document.getElementById('other-reason-text').value;
+    
+    if (!reason) {
+        alert('Por favor, selecione um motivo para o cancelamento.');
+        return;
+    }
+    
+    if (reason === 'other' && !otherReasonText.trim()) {
+        alert('Por favor, especifique o motivo do cancelamento.');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('reason', reason);
+    formData.append('other_reason', otherReasonText);
+    formData.append('csrfmiddlewaretoken', getCsrfToken());
+    
+    fetch(`/pedidos/${orderId}/cancelar/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Erro ao cancelar pedido.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erro ao cancelar pedido. Tente novamente.');
+    });
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('cancelOrderModal'));
+    modal.hide();
+}
+
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+           document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+           '';
+}
+
+// Auto-refresh for orders with tracking
+setInterval(function() {
+    const trackingButtons = document.querySelectorAll('.notification-badge');
+    if (trackingButtons.length > 0) {
+        // Simulate checking for updates (in production, make AJAX calls)
+        console.log('Checking for order updates...');
+    }
+}, 300000); // Check every 5 minutes
+</script>
+{% endblock %}

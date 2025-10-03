@@ -1,0 +1,931 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meu Perfil - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+        padding: 40px 0;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle fill="rgba(255,255,255,0.1)" cx="200" cy="200" r="150"/><circle fill="rgba(255,255,255,0.05)" cx="800" cy="600" r="100"/></svg>');
+        background-size: cover;
+    }
+    
+    .profile-header-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #28a745, #20c997);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 20px;
+        border: 4px solid rgba(255,255,255,0.3);
+        transition: transform 0.3s ease;
+    }
+    
+    .profile-avatar:hover {
+        transform: scale(1.05);
+    }
+    
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+    
+    .profile-email {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    
+    .stat-item {
+        background: rgba(255,255,255,0.2);
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .profile-content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+    }
+    
+    .profile-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .sidebar-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .sidebar-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f3f4;
+        transition: color 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .sidebar-item:last-child {
+        border-bottom: none;
+    }
+    
+    .sidebar-item:hover {
+        color: #007bff;
+    }
+    
+    .sidebar-item.active {
+        color: #007bff;
+        font-weight: 600;
+    }
+    
+    .sidebar-icon {
+        width: 20px;
+        text-align: center;
+        color: #7f8c8d;
+    }
+    
+    .sidebar-item:hover .sidebar-icon,
+    .sidebar-item.active .sidebar-icon {
+        color: #007bff;
+    }
+    
+    .profile-main {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .form-section {
+        display: none;
+    }
+    
+    .form-section.active {
+        display: block;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-control {
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        width: 100%;
+    }
+    
+    .form-control:focus {
+        background: white;
+        border-color: #007bff;
+        box-shadow: 0 0 20px rgba(0,123,255,0.1);
+        transform: translateY(-1px);
+    }
+    
+    .form-control:disabled {
+        background: #e9ecef;
+        cursor: not-allowed;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,123,255,0.3);
+        background: linear-gradient(45deg, #0056b3, #004085);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+    }
+    
+    .order-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .order-card:hover {
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .order-number {
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .order-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-processing {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-shipped {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-delivered {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+    
+    .order-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .order-detail {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+    
+    .detail-value {
+        color: #2c3e50;
+    }
+    
+    .address-card {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .address-card:hover {
+        border-color: #007bff;
+        background: #f8f9ff;
+    }
+    
+    .address-card.default {
+        border-color: #28a745;
+        background: #f8fff8;
+    }
+    
+    .address-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .address-type {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .address-default {
+        background: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .security-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    
+    .security-item:last-child {
+        border-bottom: none;
+    }
+    
+    .security-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+    
+    .security-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .security-description {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    @media (max-width: 992px) {
+        .profile-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .profile-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .profile-container {
+            padding: 20px 0;
+        }
+        
+        .profile-header {
+            padding: 30px 20px;
+            margin-bottom: 20px;
+        }
+        
+        .profile-main,
+        .sidebar-card {
+            padding: 20px;
+        }
+        
+        .profile-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .order-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-header-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="profile-avatar">
+                            {{ user.first_name.0|upper }}{{ user.last_name.0|upper }}
+                        </div>
+                        <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
+                        <p class="profile-email">{{ user.email }}</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">{{ user.orders.count|default:0 }}</span>
+                                <span class="stat-label">Pedidos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{ user.reviews.count|default:0 }}</span>
+                                <span class="stat-label">Avaliações</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">R$ {{ user.total_spent|default:0 }}</span>
+                                <span class="stat-label">Total Gasto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <!-- Navigation -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-user"></i>
+                        Minha Conta
+                    </h3>
+                    
+                    <div class="sidebar-item active" data-section="personal">
+                        <i class="fas fa-user-edit sidebar-icon"></i>
+                        <span>Dados Pessoais</span>
+                    </div>
+                    
+                    <div class="sidebar-item" data-section="orders">
+                        <i class="fas fa-shopping-bag sidebar-icon"></i>
+                        <span>Meus Pedidos</span>
+                    </div>
+                    
+                    <div class="sidebar-item" data-section="addresses">
+                        <i class="fas fa-map-marker-alt sidebar-icon"></i>
+                        <span>Endereços</span>
+                    </div>
+                    
+                    <div class="sidebar-item" data-section="security">
+                        <i class="fas fa-shield-alt sidebar-icon"></i>
+                        <span>Segurança</span>
+                    </div>
+                    
+                    <div class="sidebar-item" data-section="preferences">
+                        <i class="fas fa-cog sidebar-icon"></i>
+                        <span>Preferências</span>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-bolt"></i>
+                        Ações Rápidas
+                    </h3>
+                    
+                    <div class="sidebar-item">
+                        <i class="fas fa-shopping-cart sidebar-icon"></i>
+                        <span>Ver Carrinho</span>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <i class="fas fa-heart sidebar-icon"></i>
+                        <span>Lista de Desejos</span>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <i class="fas fa-ticket-alt sidebar-icon"></i>
+                        <span>Cupons</span>
+                    </div>
+                    
+                    <div class="sidebar-item">
+                        <i class="fas fa-headset sidebar-icon"></i>
+                        <span>Suporte</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="profile-main">
+                <!-- Personal Information Section -->
+                <div class="form-section active" id="personal-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-edit"></i>
+                        Dados Pessoais
+                    </h2>
+                    
+                    <form method="post" action="{% url 'accounts:update_profile' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Nome</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="first_name" 
+                                       value="{{ user.first_name }}" 
+                                       required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Sobrenome</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="last_name" 
+                                       value="{{ user.last_name }}" 
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   name="email" 
+                                   value="{{ user.email }}" 
+                                   required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       name="phone" 
+                                       value="{{ user.profile.phone|default:'' }}" 
+                                       placeholder="(11) 99999-9999">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Data de Nascimento</label>
+                                <input type="date" 
+                                       class="form-control" 
+                                       name="birth_date" 
+                                       value="{{ user.profile.birth_date|date:'Y-m-d'|default:'' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">CPF</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="cpf" 
+                                       value="{{ user.profile.cpf|default:'' }}" 
+                                       placeholder="000.000.000-00">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Gênero</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">Selecionar</option>
+                                    <option value="M" {% if user.profile.gender == 'M' %}selected{% endif %}>Masculino</option>
+                                    <option value="F" {% if user.profile.gender == 'F' %}selected{% endif %}>Feminino</option>
+                                    <option value="O" {% if user.profile.gender == 'O' %}selected{% endif %}>Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Orders Section -->
+                <div class="form-section" id="orders-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-shopping-bag"></i>
+                        Meus Pedidos
+                    </h2>
+                    
+                    {% if user.orders.all %}
+                        {% for order in user.orders.all %}
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-number">
+                                    Pedido #{{ order.id }}
+                                </div>
+                                <div class="order-status status-{{ order.status|lower }}">
+                                    {{ order.get_status_display }}
+                                </div>
+                            </div>
+                            
+                            <div class="order-details">
+                                <div class="order-detail">
+                                    <span class="detail-label">Data do Pedido</span>
+                                    <span class="detail-value">{{ order.created|date:'d/m/Y H:i' }}</span>
+                                </div>
+                                
+                                <div class="order-detail">
+                                    <span class="detail-label">Total</span>
+                                    <span class="detail-value">R$ {{ order.get_total_cost }}</span>
+                                </div>
+                                
+                                <div class="order-detail">
+                                    <span class="detail-label">Itens</span>
+                                    <span class="detail-value">{{ order.items.count }} produto{{ order.items.count|pluralize }}</span>
+                                </div>
+                                
+                                <div class="order-detail">
+                                    <span class="detail-label">Ação</span>
+                                    <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-primary">
+                                        Ver Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-bag" style="font-size: 3rem; color: #dee2e6; margin-bottom: 20px;"></i>
+                            <h4>Nenhum pedido encontrado</h4>
+                            <p class="text-muted">Você ainda não fez nenhum pedido em nossa loja.</p>
+                            <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart"></i> Começar a Comprar
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Addresses Section -->
+                <div class="form-section" id="addresses-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Meus Endereços
+                    </h2>
+                    
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addressModal">
+                            <i class="fas fa-plus"></i> Adicionar Novo Endereço
+                        </button>
+                    </div>
+                    
+                    {% if user.addresses.all %}
+                        {% for address in user.addresses.all %}
+                        <div class="address-card {% if address.is_default %}default{% endif %}">
+                            <div class="address-header">
+                                <span class="address-type">{{ address.get_type_display }}</span>
+                                {% if address.is_default %}
+                                    <span class="address-default">Padrão</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="address-content">
+                                <p class="mb-1">{{ address.street }}, {{ address.number }}</p>
+                                {% if address.complement %}
+                                    <p class="mb-1">{{ address.complement }}</p>
+                                {% endif %}
+                                <p class="mb-1">{{ address.neighborhood }} - {{ address.city }}/{{ address.state }}</p>
+                                <p class="mb-0">CEP: {{ address.zip_code }}</p>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-secondary me-2">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                {% if not address.is_default %}
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: #dee2e6; margin-bottom: 20px;"></i>
+                            <h4>Nenhum endereço cadastrado</h4>
+                            <p class="text-muted">Adicione um endereço para facilitar suas compras.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Security Section -->
+                <div class="form-section" id="security-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Segurança
+                    </h2>
+                    
+                    <div class="security-item">
+                        <div class="security-info">
+                            <div class="security-title">Alterar Senha</div>
+                            <div class="security-description">Mantenha sua conta segura com uma senha forte</div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                            <i class="fas fa-key"></i> Alterar
+                        </button>
+                    </div>
+                    
+                    <div class="security-item">
+                        <div class="security-info">
+                            <div class="security-title">Autenticação de Dois Fatores</div>
+                            <div class="security-description">Adicione uma camada extra de segurança</div>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="fas fa-mobile-alt"></i> Configurar
+                        </button>
+                    </div>
+                    
+                    <div class="security-item">
+                        <div class="security-info">
+                            <div class="security-title">Sessões Ativas</div>
+                            <div class="security-description">Gerencie dispositivos conectados à sua conta</div>
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="fas fa-devices"></i> Ver Sessões
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Preferences Section -->
+                <div class="form-section" id="preferences-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Preferências
+                    </h2>
+                    
+                    <form method="post" action="{% url 'accounts:update_preferences' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" 
+                                       name="email_notifications" 
+                                       class="form-check-input me-2"
+                                       {% if user.profile.email_notifications %}checked{% endif %}>
+                                Receber notificações por e-mail
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" 
+                                       name="sms_notifications" 
+                                       class="form-check-input me-2"
+                                       {% if user.profile.sms_notifications %}checked{% endif %}>
+                                Receber notificações por SMS
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" 
+                                       name="newsletter" 
+                                       class="form-check-input me-2"
+                                       {% if user.profile.newsletter %}checked{% endif %}>
+                                Receber newsletter com ofertas especiais
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Salvar Preferências
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar navigation
+    const sidebarItems = document.querySelectorAll('.sidebar-item[data-section]');
+    const formSections = document.querySelectorAll('.form-section');
+    
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const sectionId = this.dataset.section;
+            
+            // Remove active class from all items and sections
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            formSections.forEach(s => s.classList.remove('active'));
+            
+            // Add active class to clicked item and corresponding section
+            this.classList.add('active');
+            document.getElementById(sectionId + '-section').classList.add('active');
+        });
+    });
+    
+    // Phone mask
+    const phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 6) {
+                value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
+            } else if (value.length > 0) {
+                value = value.replace(/^(\d{0,2}).*/, '($1');
+            }
+            
+            e.target.value = value;
+        });
+    }
+    
+    // CPF mask
+    const cpfInput = document.querySelector('input[name="cpf"]');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 9) {
+                value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/^(\d{3})(\d{3})(\d{0,3}).*/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/^(\d{3})(\d{0,3}).*/, '$1.$2');
+            }
+            
+            e.target.value = value;
+        });
+    }
+    
+    // Auto-hide alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            if (bsAlert) {
+                bsAlert.close();
+            }
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

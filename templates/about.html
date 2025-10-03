@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Sobre Nós - E-commerce{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-5">Sobre Nós</h1>
+            
+            <div class="text-center mb-5">
+                <i class="bi bi-shop display-1 text-primary"></i>
+            </div>
+            
+            <p class="lead text-center mb-5">
+                Somos uma empresa comprometida em oferecer os melhores produtos com qualidade garantida e preços justos.
+            </p>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h3><i class="bi bi-target text-primary"></i> Nossa Missão</h3>
+                    <p>Proporcionar uma experiência de compra excepcional, oferecendo produtos de qualidade com atendimento personalizado e entrega rápida.</p>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <h3><i class="bi bi-eye text-primary"></i> Nossa Visão</h3>
+                    <p>Ser reconhecida como a melhor loja online do Brasil, referência em qualidade, confiabilidade e inovação no e-commerce.</p>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <h3><i class="bi bi-heart text-primary"></i> Nossos Valores</h3>
+                    <ul>
+                        <li>Qualidade em primeiro lugar</li>
+                        <li>Transparência nas relações</li>
+                        <li>Compromisso com o cliente</li>
+                        <li>Inovação constante</li>
+                    </ul>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <h3><i class="bi bi-award text-primary"></i> Diferenciais</h3>
+                    <ul>
+                        <li>Produtos selecionados</li>
+                        <li>Entrega rápida e segura</li>
+                        <li>Atendimento especializado</li>
+                        <li>Garantia de satisfação</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-shop"></i> Conheça Nossos Produtos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

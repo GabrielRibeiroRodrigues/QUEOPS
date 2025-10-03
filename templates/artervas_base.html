@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>{% block title %}Art'Ervas - Farmácia de Manipulação{% endblock %}</title>
+    
+    <meta name="description" content="{% block meta_description %}A melhor farmácia de manipulação da região. Frete grátis, parcelamento sem juros e site 100% seguro.{% endblock %}">
+    <meta name="keywords" content="farmácia, manipulação, medicamentos, suplementos, cosméticos, saúde">
+    <meta name="author" content="Art'Ervas Farmácia">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}Art'Ervas - Farmácia de Manipulação{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}A melhor farmácia de manipulação da região{% endblock %}">
+    <meta property="og:image" content="{% load static %}{% static 'img/og-image.jpg' %}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta property="twitter:title" content="{% block twitter_title %}Art'Ervas - Farmácia de Manipulação{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}A melhor farmácia de manipulação da região{% endblock %}">
+    <meta property="twitter:image" content="{% load static %}{% static 'img/og-image.jpg' %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+    
+    <!-- CSS -->
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{% static 'css/artervas-style.css' %}" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Pharmacy",
+        "name": "Art'Ervas Farmácia de Manipulação",
+        "description": "A melhor farmácia de manipulação da região",
+        "url": "{{ request.build_absolute_uri }}",
+        "telephone": "+55-19-3623-4112",
+        "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "BR"
+        },
+        "openingHours": "Mo-Fr 08:00-18:00, Sa 08:00-14:00"
+    }
+    </script>
+</head>
+<body>
+    <!-- Header Top -->
+    <div class="header-top">
+        <div class="container">
+            <div class="header-links">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:profile' %}">
+                        <i class="fas fa-user"></i> Olá, {{ user.first_name|default:user.username }}
+                    </a>
+                    <a href="{% url 'accounts:logout' %}">Sair</a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}">
+                        <i class="fas fa-user"></i> Entrar
+                    </a>
+                    <a href="{% url 'accounts:register' %}">Cadastre-se</a>
+                {% endif %}
+                <a href="{% url 'core:about' %}">Blog</a>
+            </div>
+            
+            <div class="header-actions">
+                <button class="cart-icon" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    <span class="cart-badge" id="cart-count">
+                        {% if cart %}{{ cart.get_item_count }}{% else %}0{% endif %}
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Main -->
+    <header class="header-main">
+        <div class="container">
+            <div class="logo">
+                <a href="{% url 'core:home' %}">
+                    <img src="{% static 'img/artervas-logo.png' %}" alt="Art'Ervas" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div style="display:none; color: var(--primary-green); font-size: 2rem; font-weight: bold;">
+                        <i class="fas fa-leaf"></i> ART'ERVAS
+                        <div style="font-size: 0.8rem; font-weight: normal; color: var(--gray);">FARMÁCIA COM MANIPULAÇÃO</div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="search-container">
+                <form class="search-form" method="GET" action="{% url 'store:product_list' %}">
+                    <input type="text" name="q" class="search-input" placeholder="O que você procura?" value="{{ request.GET.q }}">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <a href="#" class="formula-banner" onclick="openFormulaModal()">
+                <i class="fas fa-prescription-bottle-alt fa-2x text-primary-green"></i>
+                <div>
+                    <div style="font-size: 14px;">Clique aqui e manipule</div>
+                    <div style="font-weight: bold;">SUA FÓRMULA</div>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="{% url 'store:product_list' %}?category=saude-bem-estar" class="nav-link">
+                        Saúde e Bem-Estar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'store:product_list' %}?category=boa-forma" class="nav-link">
+                        Boa Forma
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'store:product_list' %}?category=beleza-cuidados" class="nav-link">
+                        Beleza e Cuidados
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'store:product_list' %}?category=presentes" class="nav-link">
+                        Presentes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'store:product_list' %}?featured=true" class="nav-link">
+                        Lançamentos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'store:product_list' %}?on_sale=true" class="nav-link">
+                        Promoções
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Art'Ervas</h3>
+                    <p>A melhor farmácia de manipulação da região, oferecendo produtos de qualidade com segurança e confiança.</p>
+                    <div class="mt-3">
+                        <i class="fas fa-phone"></i> (19) 3623-4112<br>
+                        <i class="fas fa-whatsapp"></i> (19) 3623-4112<br>
+                        <i class="fas fa-envelope"></i> contato@artervas.com.br
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Categorias</h3>
+                    <a href="{% url 'store:product_list' %}?category=medicamentos">Medicamentos</a>
+                    <a href="{% url 'store:product_list' %}?category=suplementos">Suplementos</a>
+                    <a href="{% url 'store:product_list' %}?category=cosmeticos">Cosméticos</a>
+                    <a href="{% url 'store:product_list' %}?category=fitoterapicos">Fitoterápicos</a>
+                    <a href="{% url 'store:product_list' %}?category=homeopatia">Homeopatia</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Atendimento</h3>
+                    <a href="{% url 'core:contact' %}">Fale Conosco</a>
+                    <a href="{% url 'core:about' %}">Sobre Nós</a>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Trocas e Devoluções</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Segurança</h3>
+                    <p><i class="fas fa-shield-alt text-green"></i> Site 100% Seguro</p>
+                    <p><i class="fas fa-certificate text-green"></i> ANVISA Certificada</p>
+                    <p><i class="fas fa-user-md text-green"></i> Farmacêutico Responsável</p>
+                    <p><i class="fas fa-truck text-green"></i> Entrega Garantida</p>
+                    
+                    <div class="mt-3">
+                        <h4>Siga-nos</h4>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="text-green"><i class="fab fa-facebook fa-2x"></i></a>
+                            <a href="#" class="text-green"><i class="fab fa-instagram fa-2x"></i></a>
+                            <a href="#" class="text-green"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Art'Ervas Farmácia de Manipulação. Todos os direitos reservados.</p>
+                <p>CNPJ: 00.000.000/0001-00 | Farmacêutico Responsável: Dr. João Silva - CRF-SP 12345</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Fórmula -->
+    <div class="modal fade" id="formulaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-green text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                        Manipule sua Fórmula
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulaForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Receita Médica</label>
+                            <textarea class="form-control" rows="5" placeholder="Digite aqui os componentes da sua fórmula ou cole o texto da receita médica..." required></textarea>
+                            <div class="form-text">Você também pode enviar a foto da receita pelo WhatsApp</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Telefone/WhatsApp</label>
+                                <input type="tel" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Como funciona:</strong><br>
+                            1. Envie sua receita<br>
+                            2. Nosso farmacêutico analisa<br>
+                            3. Você recebe o orçamento<br>
+                            4. Aprovando, manipulamos e entregamos
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" form="formulaForm">
+                        <i class="fas fa-paper-plane"></i> Enviar Receita
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h5><i class="fas fa-shopping-cart"></i> Carrinho</h5>
+            <button class="btn-close" onclick="toggleCart()"></button>
+        </div>
+        <div class="cart-body" id="cartItems">
+            <!-- Cart items will be loaded here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Total: R$ <span id="cartTotal">0,00</span></strong>
+            </div>
+            <a href="{% url 'cart:cart_detail' %}" class="btn btn-success w-100 mt-2">
+                Ver Carrinho Completo
+            </a>
+        </div>
+    </div>
+    
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        <div id="notificationToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-check-circle text-success me-2"></i>
+                <strong class="me-auto">Art'Ervas</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/5519362341112" class="whatsapp-float" target="_blank" title="Fale conosco no WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/artervas-main.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+
+    <style>
+        /* Cart Sidebar Styles */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cart-sidebar.open {
+            right: 0;
+        }
+        
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 9997;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* WhatsApp Float Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            z-index: 9999;
+            transition: all 0.3s ease;
+        }
+        
+        .whatsapp-float:hover {
+            background: #128C7E;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .cart-sidebar {
+                width: 100vw;
+                right: -100vw;
+            }
+            
+            .whatsapp-float {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</body>
+</html>

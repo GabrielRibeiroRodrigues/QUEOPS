@@ -1,0 +1,571 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if current_category %}{{ current_category.name }} - {% endif %}Produtos - FarmáciaSaúde{% endblock %}
+
+{% block meta_description %}{% if current_category %}{{ current_category.description|default:"Produtos de "|add:current_category.name }}{% else %}Todos os produtos da FarmáciaSaúde{% endif %} - Medicamentos, vitaminas e produtos de saúde com entrega rápida.{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Início</a></li>
+            {% if current_category %}
+                <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Produtos</a></li>
+                <li class="breadcrumb-item active">{{ current_category.name }}</li>
+            {% else %}
+                <li class="breadcrumb-item active">Produtos</li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sidebar com filtros -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-funnel"></i> Filtros</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Busca rápida -->
+                    <div class="mb-4">
+                        <label for="quickSearch" class="form-label fw-bold">Busca Rápida</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="quickSearch" placeholder="Digite o nome do produto...">
+                            <button class="btn btn-outline-primary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Categorias -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Categorias</h6>
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'store:product_list' %}" 
+                               class="list-group-item list-group-item-action border-0 {% if not current_category %}active{% endif %}">
+                                <i class="bi bi-grid me-2"></i>Todas as Categorias
+                                <span class="badge bg-secondary float-end">{{ total_products }}</span>
+                            </a>
+                            {% for category in categories %}
+                            <a href="{% url 'store:category_detail' category.slug %}" 
+                               class="list-group-item list-group-item-action border-0 {% if current_category == category.slug %}active{% endif %}">
+                                <i class="fas fa-pills me-2"></i>{{ category.name }}
+                                <span class="badge bg-secondary float-end">{{ category.product_count|default:0 }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Faixa de Preço -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Faixa de Preço</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" id="priceMin" placeholder="Min" min="0" step="0.01">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" id="priceMax" placeholder="Max" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="applyPriceFilter()">
+                            <i class="bi bi-check"></i> Aplicar
+                        </button>
+                    </div>
+
+                    <!-- Filtros Rápidos -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3">Filtros Rápidos</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterPromotion">
+                            <label class="form-check-label" for="filterPromotion">
+                                <i class="bi bi-tag text-danger"></i> Em Promoção
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterAvailable">
+                            <label class="form-check-label" for="filterAvailable">
+                                <i class="bi bi-check-circle text-success"></i> Disponível
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterNew">
+                            <label class="form-check-label" for="filterNew">
+                                <i class="bi bi-star text-warning"></i> Lançamentos
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Ordenação -->
+                    <div class="mb-3">
+                        <h6 class="fw-bold mb-3">Ordenar por</h6>
+                        <select class="form-select" id="sortSelect" onchange="updateSort()">
+                            <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Nome A-Z</option>
+                            <option value="-name" {% if current_sort == '-name' %}selected{% endif %}>Nome Z-A</option>
+                            <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Menor Preço</option>
+                            <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Maior Preço</option>
+                            <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Mais Recentes</option>
+                            <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Mais Antigos</option>
+                            <option value="-featured" {% if current_sort == '-featured' %}selected{% endif %}>Em Destaque</option>
+                        </select>
+                    </div>
+
+                    <!-- Botão Limpar Filtros -->
+                    <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                        <i class="bi bi-arrow-clockwise"></i> Limpar Filtros
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de produtos -->
+        <div class="col-lg-9">
+            <!-- Header da listagem -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        {% if current_category %}
+                            {{ current_category.name }}
+                        {% else %}
+                            Todos os Produtos
+                        {% endif %}
+                    </h2>
+                    <p class="text-muted mb-0">{{ products.paginator.count }} produto{{ products.paginator.count|pluralize }} encontrado{{ products.paginator.count|pluralize }}</p>
+                </div>
+                
+                <!-- Visualização -->
+                <div class="d-flex gap-2 mt-3 mt-md-0">
+                    <div class="btn-group" role="group" aria-label="Tipo de visualização">
+                        <button type="button" class="btn btn-outline-primary active" id="gridView" onclick="toggleView('grid')">
+                            <i class="bi bi-grid"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="listView" onclick="toggleView('list')">
+                            <i class="bi bi-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if products %}
+                <!-- Grid de produtos -->
+                <div id="productsContainer" class="row g-4">
+                    {% for product in products %}
+                    <div class="col-6 col-md-4 col-xl-4 product-item">
+                        <div class="product-card">
+                            <div class="position-relative">
+                                {% with main_image=product.get_main_image %}
+                                    {% if main_image %}
+                                        <img src="{{ main_image.image.url }}" class="card-img-top product-image" alt="{{ product.name }}" loading="lazy">
+                                    {% else %}
+                                        <div class="card-img-top product-image d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-pills display-4 text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                                
+                                <!-- Badges -->
+                                <div class="position-absolute top-0 start-0 m-2">
+                                    {% if product.get_discount_percentage %}
+                                        <span class="badge bg-danger">-{{ product.get_discount_percentage }}%</span>
+                                    {% endif %}
+                                    {% if product.is_new %}
+                                        <span class="badge bg-success ms-1">Novo</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Botões de ação rápida -->
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <button class="btn btn-light btn-sm rounded-circle" data-bs-toggle="tooltip" title="Adicionar aos favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <small class="text-muted">{{ product.category.name }}</small>
+                                </div>
+                                
+                                <h6 class="product-title">{{ product.name }}</h6>
+                                <p class="product-description">{{ product.short_description|truncatechars:60 }}</p>
+                                
+                                <!-- Avaliação (se disponível) -->
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="text-warning me-1">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <small class="text-muted">(4.2)</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        {% if product.compare_price %}
+                                            <small class="product-price-old">R$ {{ product.compare_price }}</small><br>
+                                        {% endif %}
+                                        <span class="product-price">R$ {{ product.price }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Disponibilidade -->
+                                <div class="mb-3">
+                                    {% if product.can_be_purchased %}
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle"></i> Disponível
+                                        </small>
+                                    {% else %}
+                                        <small class="text-danger">
+                                            <i class="bi bi-x-circle"></i> Indisponível
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    {% if product.can_be_purchased %}
+                                        <button class="btn btn-primary" onclick="addToCart({{ product.id }})">
+                                            <i class="bi bi-cart-plus"></i> Adicionar
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-secondary" disabled>
+                                            <i class="bi bi-x-circle"></i> Indisponível
+                                        </button>
+                                    {% endif %}
+                                    <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i> Ver detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginação -->
+                {% if products.has_other_pages %}
+                <nav aria-label="Navegação de produtos" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if products.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_sort %}&ordenar={{ current_sort }}{% endif %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ products.previous_page_number }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_sort %}&ordenar={{ current_sort }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in products.paginator.page_range %}
+                            {% if products.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_sort %}&ordenar={{ current_sort }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if products.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ products.next_page_number }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_sort %}&ordenar={{ current_sort }}{% endif %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_sort %}&ordenar={{ current_sort }}{% endif %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <!-- Nenhum produto encontrado -->
+                <div class="text-center py-5">
+                    <i class="fas fa-search display-1 text-muted mb-4"></i>
+                    <h3 class="mb-3">Nenhum produto encontrado</h3>
+                    <p class="text-muted mb-4">Não encontramos produtos que correspondam aos seus critérios de busca.</p>
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                        <a href="{% url 'store:product_list' %}" class="btn btn-primary">
+                            <i class="bi bi-grid"></i> Ver Todos os Produtos
+                        </a>
+                        <button class="btn btn-outline-primary" onclick="clearFilters()">
+                            <i class="bi bi-arrow-clockwise"></i> Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background: rgba(255,255,255,0.8); z-index: 9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Variáveis globais
+let currentView = 'grid';
+let isLoading = false;
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFilters();
+    initializeSearch();
+});
+
+// Inicializar filtros
+function initializeFilters() {
+    // Aplicar filtros salvos no localStorage
+    const savedFilters = localStorage.getItem('productFilters');
+    if (savedFilters) {
+        const filters = JSON.parse(savedFilters);
+        applyFiltersFromStorage(filters);
+    }
+    
+    // Event listeners para filtros
+    document.getElementById('filterPromotion').addEventListener('change', applyFilters);
+    document.getElementById('filterAvailable').addEventListener('change', applyFilters);
+    document.getElementById('filterNew').addEventListener('change', applyFilters);
+}
+
+// Inicializar busca
+function initializeSearch() {
+    const searchInput = document.getElementById('quickSearch');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            performQuickSearch(this.value);
+        }, 500);
+    });
+}
+
+// Alternar visualização
+function toggleView(view) {
+    currentView = view;
+    const container = document.getElementById('productsContainer');
+    const gridBtn = document.getElementById('gridView');
+    const listBtn = document.getElementById('listView');
+    
+    if (view === 'grid') {
+        container.className = 'row g-4';
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+        
+        // Atualizar classes dos itens
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.className = 'col-6 col-md-4 col-xl-4 product-item';
+        });
+    } else {
+        container.className = 'row g-3';
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        
+        // Atualizar classes dos itens
+        document.querySelectorAll('.product-item').forEach(item => {
+            item.className = 'col-12 product-item';
+        });
+    }
+    
+    localStorage.setItem('productView', view);
+}
+
+// Atualizar ordenação
+function updateSort() {
+    const sortValue = document.getElementById('sortSelect').value;
+    const url = new URL(window.location);
+    url.searchParams.set('ordenar', sortValue);
+    url.searchParams.delete('page');
+    
+    showLoading();
+    window.location.href = url.toString();
+}
+
+// Aplicar filtro de preço
+function applyPriceFilter() {
+    const minPrice = document.getElementById('priceMin').value;
+    const maxPrice = document.getElementById('priceMax').value;
+    
+    const url = new URL(window.location);
+    
+    if (minPrice) url.searchParams.set('preco_min', minPrice);
+    else url.searchParams.delete('preco_min');
+    
+    if (maxPrice) url.searchParams.set('preco_max', maxPrice);
+    else url.searchParams.delete('preco_max');
+    
+    url.searchParams.delete('page');
+    
+    showLoading();
+    window.location.href = url.toString();
+}
+
+// Aplicar filtros
+function applyFilters() {
+    const filters = {
+        promotion: document.getElementById('filterPromotion').checked,
+        available: document.getElementById('filterAvailable').checked,
+        new: document.getElementById('filterNew').checked
+    };
+    
+    // Salvar filtros
+    localStorage.setItem('productFilters', JSON.stringify(filters));
+    
+    const url = new URL(window.location);
+    
+    if (filters.promotion) url.searchParams.set('promocao', '1');
+    else url.searchParams.delete('promocao');
+    
+    if (filters.available) url.searchParams.set('disponivel', '1');
+    else url.searchParams.delete('disponivel');
+    
+    if (filters.new) url.searchParams.set('novo', '1');
+    else url.searchParams.delete('novo');
+    
+    url.searchParams.delete('page');
+    
+    showLoading();
+    window.location.href = url.toString();
+}
+
+// Aplicar filtros do localStorage
+function applyFiltersFromStorage(filters) {
+    document.getElementById('filterPromotion').checked = filters.promotion || false;
+    document.getElementById('filterAvailable').checked = filters.available || false;
+    document.getElementById('filterNew').checked = filters.new || false;
+}
+
+// Limpar filtros
+function clearFilters() {
+    // Limpar campos
+    document.getElementById('quickSearch').value = '';
+    document.getElementById('priceMin').value = '';
+    document.getElementById('priceMax').value = '';
+    document.getElementById('filterPromotion').checked = false;
+    document.getElementById('filterAvailable').checked = false;
+    document.getElementById('filterNew').checked = false;
+    
+    // Limpar localStorage
+    localStorage.removeItem('productFilters');
+    
+    // Redirecionar para página limpa
+    showLoading();
+    window.location.href = '{% url "store:product_list" %}';
+}
+
+// Busca rápida
+function performQuickSearch(query) {
+    if (query.length < 2) return;
+    
+    const url = new URL(window.location);
+    url.searchParams.set('busca', query);
+    url.searchParams.delete('page');
+    
+    showLoading();
+    window.location.href = url.toString();
+}
+
+// Adicionar ao carrinho
+function addToCart(productId) {
+    if (isLoading) return;
+    
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    // Mostrar loading no botão
+    button.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Adicionando...';
+    button.disabled = true;
+    isLoading = true;
+    
+    fetch(`/carrinho/adicionar/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'quantity': 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            button.innerHTML = '<i class="bi bi-check"></i> Adicionado!';
+            button.classList.remove('btn-primary');
+            button.classList.add('btn-success');
+            
+            // Mostrar notificação
+            FarmaciaJS.showNotification('Produto adicionado ao carrinho!', 'success');
+            
+            // Atualizar contador do carrinho
+            updateCartCounter(data.cart_total_items);
+            
+            // Restaurar botão
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-primary');
+                button.disabled = false;
+                isLoading = false;
+            }, 2000);
+        } else {
+            throw new Error(data.message || 'Erro ao adicionar produto');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        button.innerHTML = originalText;
+        button.disabled = false;
+        isLoading = false;
+        FarmaciaJS.showNotification('Erro ao adicionar produto ao carrinho', 'error');
+    });
+}
+
+// Atualizar contador do carrinho
+function updateCartCounter(count) {
+    const counter = document.querySelector('.cart-badge');
+    if (counter) {
+        counter.textContent = count;
+        counter.style.display = count > 0 ? 'flex' : 'none';
+    }
+}
+
+// Mostrar loading
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.remove('d-none');
+}
+
+// Esconder loading
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.add('d-none');
+}
+
+// Restaurar visualização salva
+document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('productView');
+    if (savedView && savedView !== 'grid') {
+        toggleView(savedView);
+    }
+});
+</script>
+{% endblock %}

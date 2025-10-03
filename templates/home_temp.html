@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Início - E-commerce{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">Bem-vindo à nossa loja!</h1>
+                <p class="lead">Encontre os melhores produtos com qualidade garantida e preços incríveis.</p>
+                <a href="#" class="btn btn-light btn-lg">
+                    <i class="bi bi-shop"></i> Ver Produtos
+                </a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-cart-check display-1"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sistema de Autenticação Implementado -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="mb-4">🚀 Sistema de E-commerce Profissional</h2>
+                <p class="lead">Plataforma completa com sistema de autenticação avançado!</p>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-user-shield display-4 text-primary mb-3"></i>
+                        <h5 class="card-title">Sistema de Contas</h5>
+                        <p class="card-text">
+                            Login, registro, recuperação de senha e gerenciamento completo de perfil.
+                        </p>
+                        {% if not user.is_authenticated %}
+                            <a href="{% url 'accounts:register' %}" class="btn btn-primary">Criar Conta</a>
+                        {% else %}
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-success">Meu Perfil</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shopping-cart display-4 text-success mb-3"></i>
+                        <h5 class="card-title">Carrinho Inteligente</h5>
+                        <p class="card-text">
+                            Sistema de carrinho persistente com cálculo automático de frete e cupons.
+                        </p>
+                        <a href="#" class="btn btn-success" onclick="alert('Carrinho em desenvolvimento!')">Ver Carrinho</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-box display-4 text-info mb-3"></i>
+                        <h5 class="card-title">Gestão de Pedidos</h5>
+                        <p class="card-text">
+                            Sistema completo de pedidos com acompanhamento e histórico detalhado.
+                        </p>
+                        <a href="#" class="btn btn-info" onclick="alert('Pedidos em desenvolvimento!')">Ver Pedidos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recursos Implementados -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">✅ Funcionalidades Implementadas</h2>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-3"></i>
+                    <span>Sistema de autenticação completo</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-3"></i>
+                    <span>Templates profissionais e responsivos</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-3"></i>
+                    <span>Gerenciamento de perfil e endereços</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-3"></i>
+                    <span>Recuperação de senha segura</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-3"></i>
+                    <span>Dashboard do usuário</span>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-3"></i>
+                    <span>Interface administrativa</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Teste de Autenticação -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h3 class="mb-4">🎯 Teste o Sistema</h3>
+                {% if user.is_authenticated %}
+                    <div class="alert alert-success">
+                        <h5>Olá, {{ user.get_full_name|default:user.username }}! 👋</h5>
+                        <p>Você está logado com sucesso. O sistema de autenticação está funcionando perfeitamente!</p>
+                        <div class="mt-3">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-primary me-2">
+                                <i class="fas fa-user"></i> Ver Perfil
+                            </a>
+                            <a href="{% url 'accounts:logout' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h5>Faça login ou crie sua conta!</h5>
+                        <p>Teste o sistema de autenticação completo com registro, login e recuperação de senha.</p>
+                        <div class="mt-3">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-primary me-2">
+                                <i class="fas fa-sign-in-alt"></i> Fazer Login
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="btn btn-success">
+                                <i class="fas fa-user-plus"></i> Criar Conta
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vantagens -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <i class="bi bi-truck display-4 mb-3"></i>
+                <h5>Frete Grátis</h5>
+                <p>Em compras acima de R$ 99</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <i class="bi bi-shield-check display-4 mb-3"></i>
+                <h5>Compra Segura</h5>
+                <p>Seus dados protegidos</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <i class="bi bi-arrow-clockwise display-4 mb-3"></i>
+                <h5>Troca Fácil</h5>
+                <p>30 dias para trocar</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <i class="bi bi-headset display-4 mb-3"></i>
+                <h5>Suporte 24h</h5>
+                <p>Atendimento sempre disponível</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

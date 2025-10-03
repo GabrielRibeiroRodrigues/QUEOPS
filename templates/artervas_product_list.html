@@ -1,0 +1,787 @@
+{% extends 'artervas_base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if category %}
+        {{ category.name }} - Art'Ervas
+    {% elif query %}
+        Busca por "{{ query }}" - Art'Ervas
+    {% else %}
+        Produtos - Art'Ervas
+    {% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if category %}
+        Encontre os melhores produtos de {{ category.name|lower }} na Art'Ervas. Frete grátis, parcelamento sem juros e entrega rápida.
+    {% else %}
+        Explore nossa ampla variedade de medicamentos, suplementos e cosméticos. A melhor farmácia de manipulação da região.
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Início</a></li>
+            {% if category %}
+                <li class="breadcrumb-item active">{{ category.name }}</li>
+            {% elif query %}
+                <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Produtos</a></li>
+                <li class="breadcrumb-item active">Busca por "{{ query }}"</li>
+            {% else %}
+                <li class="breadcrumb-item active">Produtos</li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sidebar Filtros -->
+        <div class="col-lg-3 mb-4">
+            <div class="filters-sidebar">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-filter"></i> Filtros
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Busca -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Buscar Produtos</label>
+                            <form method="GET" class="search-form-sidebar">
+                                <div class="input-group">
+                                    <input type="text" name="q" class="form-control" placeholder="Digite aqui..." value="{{ query }}">
+                                    <button type="submit" class="btn btn-outline-success">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Categorias -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Categorias</h6>
+                            <div class="category-filters">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" value="" id="cat-all" {% if not category %}checked{% endif %}>
+                                    <label class="form-check-label" for="cat-all">
+                                        Todas as categorias
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" value="medicamentos" id="cat-med">
+                                    <label class="form-check-label" for="cat-med">
+                                        <i class="fas fa-pills text-primary"></i> Medicamentos
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" value="suplementos" id="cat-sup">
+                                    <label class="form-check-label" for="cat-sup">
+                                        <i class="fas fa-capsules text-success"></i> Suplementos
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" value="cosmeticos" id="cat-cos">
+                                    <label class="form-check-label" for="cat-cos">
+                                        <i class="fas fa-spa text-info"></i> Cosméticos
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" value="fitoterapicos" id="cat-fito">
+                                    <label class="form-check-label" for="cat-fito">
+                                        <i class="fas fa-leaf text-success"></i> Fitoterápicos
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" value="homeopatia" id="cat-homeo">
+                                    <label class="form-check-label" for="cat-homeo">
+                                        <i class="fas fa-vial text-warning"></i> Homeopatia
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Faixa de Preço -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Faixa de Preço</h6>
+                            <div class="price-filters">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="price-1">
+                                    <label class="form-check-label" for="price-1">
+                                        Até R$ 25,00
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="price-2">
+                                    <label class="form-check-label" for="price-2">
+                                        R$ 25,00 - R$ 50,00
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="price-3">
+                                    <label class="form-check-label" for="price-3">
+                                        R$ 50,00 - R$ 100,00
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="price-4">
+                                    <label class="form-check-label" for="price-4">
+                                        Acima de R$ 100,00
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Disponibilidade -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Disponibilidade</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="available">
+                                <label class="form-check-label" for="available">
+                                    <i class="fas fa-check-circle text-success"></i> Disponível
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="promotion">
+                                <label class="form-check-label" for="promotion">
+                                    <i class="fas fa-tag text-danger"></i> Em promoção
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" onclick="applyFilters()">
+                                <i class="fas fa-filter"></i> Aplicar Filtros
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner Lateral -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center bg-light-green">
+                        <i class="fas fa-prescription-bottle-alt fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">Manipule sua Fórmula</h5>
+                        <p class="small mb-3">Envie sua receita e receba um orçamento personalizado</p>
+                        <button class="btn btn-success btn-sm" onclick="openFormulaModal()">
+                            <i class="fas fa-paper-plane"></i> Enviar Receita
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Produtos -->
+        <div class="col-lg-9">
+            <!-- Header da Lista -->
+            <div class="products-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="h3 mb-0">
+                            {% if category %}
+                                {{ category.name }}
+                            {% elif query %}
+                                Resultados para "{{ query }}"
+                            {% else %}
+                                Todos os Produtos
+                            {% endif %}
+                        </h1>
+                        <p class="text-muted mb-0">
+                            {{ products|length }} produto{{ products|length|pluralize }} encontrado{{ products|length|pluralize }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-end align-items-center gap-3">
+                            <!-- Ordenação -->
+                            <div class="d-flex align-items-center">
+                                <label class="form-label me-2 mb-0">Ordenar por:</label>
+                                <select class="form-select form-select-sm" style="width: auto;" onchange="sortProducts(this.value)">
+                                    <option value="name">Nome A-Z</option>
+                                    <option value="-name">Nome Z-A</option>
+                                    <option value="price">Menor preço</option>
+                                    <option value="-price">Maior preço</option>
+                                    <option value="-created_at">Mais recentes</option>
+                                    <option value="popularity">Mais populares</option>
+                                </select>
+                            </div>
+
+                            <!-- Visualização -->
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="setView('grid')" id="view-grid">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setView('list')" id="view-list">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de Produtos -->
+            <div class="products-container" id="products-grid">
+                {% if products %}
+                    <div class="products-grid">
+                        {% for product in products %}
+                        <div class="product-card fade-in-up" data-category="{{ product.category.slug }}" data-price="{{ product.price }}">
+                            {% if product.discount_percentage %}
+                                <div class="discount-badge">{{ product.discount_percentage }}% OFF</div>
+                            {% endif %}
+                            
+                            <a href="{{ product.get_absolute_url }}" class="product-link">
+                                {% with main_image=product.get_main_image %}
+                                    {% if main_image %}
+                                        <img src="{{ main_image.image.url }}" alt="{{ product.name }}" class="product-image" loading="lazy">
+                                    {% else %}
+                                        <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-pills fa-3x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                            </a>
+                            
+                            <div class="product-info">
+                                <div class="product-category">
+                                    <small class="text-muted">{{ product.category.name }}</small>
+                                </div>
+                                
+                                <h3 class="product-name">
+                                    <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                                </h3>
+                                
+                                {% if product.short_description %}
+                                    <p class="product-description">{{ product.short_description|truncatechars:80 }}</p>
+                                {% endif %}
+                                
+                                {% if product.original_price and product.original_price != product.price %}
+                                    <div class="product-original-price">
+                                        <del>R$ {{ product.original_price }}</del>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="product-price">R$ {{ product.price }}</div>
+                                
+                                <div class="product-installments">
+                                    ou <strong>4x</strong> de <strong>R$ {{ product.installment_price }}</strong> sem juros
+                                </div>
+                                
+                                <!-- Avaliação -->
+                                <div class="product-rating mb-2">
+                                    <div class="stars">
+                                        {% for i in "12345" %}
+                                            <i class="fas fa-star {% if forloop.counter <= product.average_rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted">({{ product.review_count }} avaliações)</small>
+                                </div>
+                                
+                                <!-- Disponibilidade -->
+                                <div class="product-availability mb-3">
+                                    {% if product.is_available %}
+                                        <small class="text-success">
+                                            <i class="fas fa-check-circle"></i> Disponível
+                                        </small>
+                                    {% else %}
+                                        <small class="text-danger">
+                                            <i class="fas fa-times-circle"></i> Indisponível
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="product-actions">
+                                    {% if product.is_available %}
+                                        <button class="btn-add-cart" onclick="addToCart({{ product.id }})">
+                                            <i class="fas fa-cart-plus"></i> Comprar
+                                        </button>
+                                    {% else %}
+                                        <button class="btn-add-cart" disabled>
+                                            <i class="fas fa-ban"></i> Indisponível
+                                        </button>
+                                    {% endif %}
+                                    <button class="btn-wishlist" onclick="toggleWishlist({{ product.id }})">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                    <button class="btn-quick-view" onclick="quickView({{ product.id }})" title="Visualização rápida">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <!-- Nenhum produto encontrado -->
+                    <div class="no-products text-center py-5">
+                        <i class="fas fa-search fa-5x text-muted mb-4"></i>
+                        <h3 class="mb-3">Nenhum produto encontrado</h3>
+                        {% if query %}
+                            <p class="text-muted mb-4">
+                                Não encontramos produtos para sua busca "{{ query }}". 
+                                Tente usar termos diferentes ou navegue pelas categorias.
+                            </p>
+                        {% else %}
+                            <p class="text-muted mb-4">
+                                Não há produtos disponíveis nesta categoria no momento.
+                            </p>
+                        {% endif %}
+                        
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                            <a href="{% url 'store:product_list' %}" class="btn btn-success">
+                                <i class="fas fa-th"></i> Ver Todos os Produtos
+                            </a>
+                            <button class="btn btn-outline-success" onclick="openFormulaModal()">
+                                <i class="fas fa-prescription-bottle-alt"></i> Manipular Fórmula
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Paginação -->
+            {% if products.has_other_pages %}
+            <nav aria-label="Paginação de produtos" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                        {% if products.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Visualização Rápida -->
+<div class="modal fade" id="quickViewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Visualização Rápida</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="quickViewContent">
+                <!-- Conteúdo será carregado via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Lista de Produtos Específico */
+.filters-sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.products-list .product-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.products-list .product-image {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+.products-list .product-info {
+    flex: 1;
+}
+
+.product-rating .stars {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.product-rating .stars i {
+    font-size: 14px;
+}
+
+.product-availability {
+    font-size: 14px;
+}
+
+.btn-quick-view {
+    background: white;
+    border: 2px solid var(--primary-green);
+    color: var(--primary-green);
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-quick-view:hover {
+    background: var(--primary-green);
+    color: white;
+}
+
+.no-products {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Filtros */
+.form-check {
+    margin-bottom: 10px;
+}
+
+.form-check-label {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .filters-sidebar {
+        position: static;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .products-header .row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .products-header .col-md-6:last-child {
+        text-align: left !important;
+    }
+    
+    .products-list .product-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .products-list .product-image {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+}
+
+/* Loading State */
+.products-loading {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.products-loading.show {
+    display: block;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-green);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Variáveis globais para filtros
+let currentView = 'grid';
+let currentSort = 'name';
+let appliedFilters = {};
+
+// Aplicar filtros
+function applyFilters() {
+    const filters = {};
+    
+    // Categoria
+    const selectedCategory = document.querySelector('input[name="category"]:checked');
+    if (selectedCategory && selectedCategory.value) {
+        filters.category = selectedCategory.value;
+    }
+    
+    // Preço
+    const priceFilters = [];
+    document.querySelectorAll('.price-filters input:checked').forEach(input => {
+        priceFilters.push(input.id);
+    });
+    if (priceFilters.length > 0) {
+        filters.price = priceFilters;
+    }
+    
+    // Disponibilidade
+    if (document.getElementById('available').checked) {
+        filters.available = true;
+    }
+    if (document.getElementById('promotion').checked) {
+        filters.promotion = true;
+    }
+    
+    appliedFilters = filters;
+    filterProducts();
+}
+
+// Limpar filtros
+function clearFilters() {
+    document.querySelectorAll('.filters-sidebar input').forEach(input => {
+        if (input.type === 'radio') {
+            input.checked = input.id === 'cat-all';
+        } else {
+            input.checked = false;
+        }
+    });
+    
+    appliedFilters = {};
+    filterProducts();
+}
+
+// Filtrar produtos
+function filterProducts() {
+    const products = document.querySelectorAll('.product-card');
+    let visibleCount = 0;
+    
+    products.forEach(product => {
+        let show = true;
+        
+        // Filtro de categoria
+        if (appliedFilters.category) {
+            const productCategory = product.dataset.category;
+            if (productCategory !== appliedFilters.category) {
+                show = false;
+            }
+        }
+        
+        // Filtro de preço
+        if (appliedFilters.price && appliedFilters.price.length > 0) {
+            const productPrice = parseFloat(product.dataset.price);
+            let priceMatch = false;
+            
+            appliedFilters.price.forEach(priceRange => {
+                switch(priceRange) {
+                    case 'price-1':
+                        if (productPrice <= 25) priceMatch = true;
+                        break;
+                    case 'price-2':
+                        if (productPrice > 25 && productPrice <= 50) priceMatch = true;
+                        break;
+                    case 'price-3':
+                        if (productPrice > 50 && productPrice <= 100) priceMatch = true;
+                        break;
+                    case 'price-4':
+                        if (productPrice > 100) priceMatch = true;
+                        break;
+                }
+            });
+            
+            if (!priceMatch) show = false;
+        }
+        
+        // Mostrar/ocultar produto
+        if (show) {
+            product.style.display = 'block';
+            visibleCount++;
+        } else {
+            product.style.display = 'none';
+        }
+    });
+    
+    // Atualizar contador
+    updateProductCount(visibleCount);
+}
+
+// Ordenar produtos
+function sortProducts(sortBy) {
+    currentSort = sortBy;
+    const container = document.querySelector('.products-grid');
+    const products = Array.from(container.children);
+    
+    products.sort((a, b) => {
+        switch(sortBy) {
+            case 'name':
+                return a.querySelector('.product-name a').textContent.localeCompare(
+                    b.querySelector('.product-name a').textContent
+                );
+            case '-name':
+                return b.querySelector('.product-name a').textContent.localeCompare(
+                    a.querySelector('.product-name a').textContent
+                );
+            case 'price':
+                return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+            case '-price':
+                return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+            default:
+                return 0;
+        }
+    });
+    
+    // Reordenar no DOM
+    products.forEach(product => container.appendChild(product));
+}
+
+// Alterar visualização
+function setView(view) {
+    currentView = view;
+    const container = document.getElementById('products-grid');
+    const gridBtn = document.getElementById('view-grid');
+    const listBtn = document.getElementById('view-list');
+    
+    if (view === 'grid') {
+        container.className = 'products-container';
+        container.innerHTML = '<div class="products-grid">' + container.innerHTML + '</div>';
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+    } else {
+        container.className = 'products-container products-list';
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+    }
+}
+
+// Visualização rápida
+function quickView(productId) {
+    const modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+    const content = document.getElementById('quickViewContent');
+    
+    // Mostrar loading
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="loading-spinner"></div>
+            <p>Carregando produto...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Simular carregamento de dados do produto
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="/static/img/produto-placeholder.jpg" class="img-fluid rounded" alt="Produto">
+                </div>
+                <div class="col-md-6">
+                    <h4>Nome do Produto</h4>
+                    <div class="mb-2">
+                        <div class="stars">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="far fa-star text-muted"></i>
+                        </div>
+                        <small class="text-muted">(15 avaliações)</small>
+                    </div>
+                    <p class="text-muted">Descrição breve do produto...</p>
+                    <div class="h4 text-success mb-3">R$ 29,90</div>
+                    <div class="mb-3">
+                        <small class="text-muted">ou 4x de R$ 7,48 sem juros</small>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success" onclick="addToCart(${productId})">
+                            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                        </button>
+                        <a href="/produto/${productId}/" class="btn btn-outline-success">
+                            <i class="fas fa-eye"></i> Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+// Atualizar contador de produtos
+function updateProductCount(count) {
+    const countElement = document.querySelector('.products-header p');
+    if (countElement) {
+        countElement.textContent = `${count} produto${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+    }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar filtros da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    
+    if (category) {
+        const categoryInput = document.getElementById(`cat-${category}`);
+        if (categoryInput) {
+            categoryInput.checked = true;
+        }
+    }
+    
+    // Event listeners para filtros em tempo real
+    document.querySelectorAll('.category-filters input').forEach(input => {
+        input.addEventListener('change', applyFilters);
+    });
+});
+</script>
+{% endblock %}

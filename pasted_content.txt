@@ -1,0 +1,48 @@
+Estou iniciando um projeto para desenvolver uma plataforma de e-commerce e gostaria que você fosse o responsável pela sua construção.
+O objetivo é criar um site robusto, seguro e escalável, utilizando o framework Django. Temos como referência as funcionalidades e a experiência do usuário do site httpsa://queopsnativa.com.br, mas com uma implementação totalmente nova e moderna.
+Para guiar o desenvolvimento, preparei um documento detalhado de requisitos (funcionais e não funcionais) que deve ser seguido rigorosamente.
+
+1. Visão Geral do Projeto
+Produto: Site de e-commerce completo.
+Tecnologia Principal (Backend): Python 3.x com Django 4.x (ou superior).
+Banco de Dados: PostgreSQL (para ambiente de produção).
+Frontend: A ser definido por você, mas deve ser um layout limpo, moderno e totalmente responsivo. Sugestões: Bootstrap 5, Tailwind CSS, ou um template customizado.
+Objetivo: Criar uma loja virtual com gerenciamento de produtos, carrinho de compras, checkout com pagamento online e área do cliente.
+2. Estrutura da Aplicação (Sugestão)
+Para garantir a organização e manutenibilidade, o projeto deve ser dividido em aplicações Django modulares:
+core: Lógica central, páginas estáticas (Home, Sobre, Contato).
+store: Gerenciamento de Produtos, Categorias, Busca e Filtros.
+cart: Funcionalidades do carrinho de compras (baseado em sessões).
+orders: Lógica de checkout, criação e gerenciamento de pedidos.
+accounts: Autenticação, perfis de usuário e histórico de pedidos.
+3. Requisitos Funcionais Obrigatórios
+Você deve implementar todos os requisitos funcionais detalhados no documento anexo. Em resumo, o sistema precisa ter:
+Módulo de Catálogo (store):
+Painel Django Admin completo para CRUD (Criar, Ler, Atualizar, Deletar) de produtos e categorias.
+Páginas públicas de listagem e detalhes dos produtos.
+Funcionalidade de busca por texto e filtros por categoria e preço.
+Módulo de Carrinho (cart):
+Adicionar/remover/atualizar produtos no carrinho.
+Cálculo de frete via API (Correios).
+Carrinho persistente para usuários não logados (usar sessões do Django).
+Módulo de Pedidos (orders):
+Processo de checkout transparente em poucas etapas.
+Integração com gateway de pagamento brasileiro (Mercado Pago ou PagSeguro) para aceitar Cartão de Crédito, Boleto e Pix.
+Criação do pedido no banco de dados após pagamento confirmado e baixa automática de estoque.
+Envio de e-mails transacionais (confirmação de pedido, pagamento, envio).
+Módulo de Contas (accounts):
+Sistema completo de cadastro, login/logout e recuperação de senha.
+Área do cliente para visualizar/editar dados e consultar o histórico de pedidos.
+4. Requisitos Não Funcionais (Critérios de Qualidade)
+A qualidade do projeto será avaliada com base nestes pontos:
+Desempenho: As páginas devem carregar em menos de 3 segundos. Otimize as queries do banco de dados (use select_related/prefetch_related) e configure um sistema de cache (ex: Redis) para as partes mais acessadas.
+Segurança: Siga todas as melhores práticas de segurança do Django. O site deve rodar 100% em HTTPS. As chaves de API e segredos devem ser gerenciados por variáveis de ambiente (nunca versionados no Git).
+Código e Manutenibilidade: O código deve ser limpo, comentado e seguir a PEP 8. Você deve criar uma suíte de testes automatizados (pytest) para as funcionalidades críticas (ex: lógica de pedidos e pagamento).
+Usabilidade: O design deve ser responsivo e testado nos principais navegadores e tamanhos de tela (desktop, tablet e mobile).
+5. Entregáveis
+Ao final do projeto, espero receber:
+O código-fonte completo .
+Um arquivo README.md claro com instruções detalhadas para configurar o ambiente de desenvolvimento local e rodar o projeto.
+Um arquivo requirements.txt (ou similar) com todas as dependências.
+Configuração para containerização com Docker (Dockerfile e docker-compose.yml) para facilitar o deploy e o desenvolvimento.
+

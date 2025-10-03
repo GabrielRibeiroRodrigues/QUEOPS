@@ -1,0 +1,548 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Farmácia - Sua farmácia online de confiança{% endblock %}
+
+{% block meta_description %}Farmácia online com medicamentos, vitaminas, cosméticos e produtos de saúde. Entrega rápida, preços baixos e atendimento especializado.{% endblock %}
+
+{% block meta_keywords %}farmácia online, medicamentos, vitaminas, cosméticos, saúde, bem-estar, entrega rápida{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title">Sua saúde em primeiro lugar</h1>
+                <p class="hero-subtitle">Medicamentos, vitaminas e produtos de saúde com qualidade garantida. Entrega rápida e segura em todo o Brasil.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{% url 'store:product_list' %}" class="hero-cta">
+                        <i class="bi bi-shop"></i> Ver Produtos
+                    </a>
+                    <a href="#categorias" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-grid"></i> Categorias
+                    </a>
+                </div>
+                
+                <!-- Badges de Confiança -->
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <div class="d-flex align-items-center text-white-50">
+                        <i class="bi bi-shield-check me-2"></i>
+                        <small>Autorizado pela ANVISA</small>
+                    </div>
+                    <div class="d-flex align-items-center text-white-50">
+                        <i class="bi bi-truck me-2"></i>
+                        <small>Entrega em 24h</small>
+                    </div>
+                    <div class="d-flex align-items-center text-white-50">
+                        <i class="bi bi-award me-2"></i>
+                        <small>Farmacêutico responsável</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-image position-relative">
+                    <!-- Elementos Decorativos Modernos -->
+                    <div class="floating" style="position: absolute; top: 10%; left: 10%; width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%; animation-delay: 0s;"></div>
+                    <div class="floating" style="position: absolute; top: 30%; right: 15%; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 30%; animation-delay: 1s;"></div>
+                    <div class="floating" style="position: absolute; bottom: 20%; left: 20%; width: 60px; height: 60px; background: rgba(255,255,255,0.12); border-radius: 20%; animation-delay: 2s;"></div>
+                    
+                    <!-- Ícone Principal com Efeito Glass -->
+                    <div class="glass p-5" style="border-radius: 50%; display: inline-block; margin: 2rem;">
+                        <i class="fas fa-heartbeat" style="font-size: 8rem; color: rgba(255,255,255,0.9);"></i>
+                    </div>
+                    
+                    <!-- Badges de Confiança Flutuantes -->
+                    <div class="position-absolute" style="top: 20%; right: 0; transform: rotate(15deg);">
+                        <div class="glass px-3 py-2 rounded-pill">
+                            <small class="text-white fw-semibold">
+                                <i class="bi bi-shield-check me-1"></i>
+                                ANVISA Autorizada
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="position-absolute" style="bottom: 30%; left: 0; transform: rotate(-15deg);">
+                        <div class="glass px-3 py-2 rounded-pill">
+                            <small class="text-white fw-semibold">
+                                <i class="bi bi-truck me-1"></i>
+                                Entrega 24h
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Barra de Busca Rápida Mobile -->
+<section class="search-section d-lg-none">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="position-relative">
+                    <input type="text" class="form-control search-input" placeholder="Buscar medicamentos, produtos..." aria-label="Buscar produtos">
+                    <button class="btn btn-primary position-absolute top-50 end-0 translate-middle-y me-1" type="button">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categorias Principais -->
+<section id="categorias" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">Categorias Principais</h2>
+            <p class="lead text-muted">Encontre rapidamente o que você precisa</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-card h-100 p-4">
+                    <div class="category-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h6 class="fw-bold">Medicamentos</h6>
+                    <p class="text-muted small mb-3">Prescrição médica</p>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Ver produtos</a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-card h-100 p-4">
+                    <div class="category-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h6 class="fw-bold">Vitaminas</h6>
+                    <p class="text-muted small mb-3">Suplementos</p>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Ver produtos</a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-card h-100 p-4">
+                    <div class="category-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h6 class="fw-bold">Cosméticos</h6>
+                    <p class="text-muted small mb-3">Beleza e cuidados</p>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Ver produtos</a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-card h-100 p-4">
+                    <div class="category-icon">
+                        <i class="fas fa-pump-soap"></i>
+                    </div>
+                    <h6 class="fw-bold">Higiene</h6>
+                    <p class="text-muted small mb-3">Cuidados pessoais</p>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Ver produtos</a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-card h-100 p-4">
+                    <div class="category-icon">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <h6 class="fw-bold">Infantil</h6>
+                    <p class="text-muted small mb-3">Mamãe e bebê</p>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Ver produtos</a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="category-card h-100 p-4">
+                    <div class="category-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h6 class="fw-bold">Fitness</h6>
+                    <p class="text-muted small mb-3">Suplementos</p>
+                    <a href="#" class="btn btn-outline-primary btn-sm">Ver produtos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Produtos em Destaque -->
+{% if featured_products %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">Produtos em Destaque</h2>
+            <p class="lead text-muted">Selecionados especialmente para você</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for product in featured_products %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-card">
+                    {% with main_image=product.get_main_image %}
+                        {% if main_image %}
+                            <img src="{{ main_image.image.url }}" class="card-img-top product-image" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <div class="card-img-top product-image d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-pills display-4 text-muted"></i>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="card-body">
+                        <h6 class="product-title">{{ product.name }}</h6>
+                        <p class="product-description">{{ product.short_description|truncatechars:50 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                {% if product.compare_price %}
+                                    <small class="product-price-old">R$ {{ product.compare_price }}</small><br>
+                                {% endif %}
+                                <span class="product-price">R$ {{ product.price }}</span>
+                            </div>
+                            
+                            {% if product.get_discount_percentage %}
+                                <span class="product-discount">-{{ product.get_discount_percentage }}%</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {% if product.can_be_purchased %}
+                                <button class="btn btn-primary" onclick="addToCart({{ product.id }})">
+                                    <i class="bi bi-cart-plus"></i> Adicionar
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="bi bi-x-circle"></i> Indisponível
+                                </button>
+                            {% endif %}
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-grid"></i> Ver Todos os Produtos
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Serviços e Diferenciais -->
+<section class="advantages-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">Por que escolher a Farmácia?</h2>
+            <p class="lead text-muted">Cuidamos da sua saúde com responsabilidade e qualidade</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="advantage-item">
+                    <div class="advantage-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h5 class="advantage-title">Farmacêutico Responsável</h5>
+                    <p class="advantage-description">Atendimento especializado com farmacêutico habilitado</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="advantage-item">
+                    <div class="advantage-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h5 class="advantage-title">Entrega Rápida</h5>
+                    <p class="advantage-description">Receba em casa em até 24h para região metropolitana</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="advantage-item">
+                    <div class="advantage-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5 class="advantage-title">Compra Segura</h5>
+                    <p class="advantage-description">Produtos originais e dados protegidos com certificação SSL</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="advantage-item">
+                    <div class="advantage-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h5 class="advantage-title">Suporte Especializado</h5>
+                    <p class="advantage-description">Atendimento farmacêutico disponível para dúvidas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Produtos Mais Recentes -->
+{% if latest_products %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">Lançamentos</h2>
+            <p class="lead text-muted">Novos produtos para sua saúde e bem-estar</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for product in latest_products %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-card">
+                    <div class="position-relative">
+                        {% with main_image=product.get_main_image %}
+                            {% if main_image %}
+                                <img src="{{ main_image.image.url }}" class="card-img-top product-image" alt="{{ product.name }}" loading="lazy">
+                            {% else %}
+                                <div class="card-img-top product-image d-flex align-items-center justify-content-center bg-light">
+                                    <i class="fas fa-pills display-4 text-muted"></i>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        <span class="badge bg-success position-absolute top-0 start-0 m-2">Novo</span>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h6 class="product-title">{{ product.name }}</h6>
+                        <p class="product-description">{{ product.short_description|truncatechars:50 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                {% if product.compare_price %}
+                                    <small class="product-price-old">R$ {{ product.compare_price }}</small><br>
+                                {% endif %}
+                                <span class="product-price">R$ {{ product.price }}</span>
+                            </div>
+                            
+                            {% if product.get_discount_percentage %}
+                                <span class="product-discount">-{{ product.get_discount_percentage }}%</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {% if product.can_be_purchased %}
+                                <button class="btn btn-primary" onclick="addToCart({{ product.id }})">
+                                    <i class="bi bi-cart-plus"></i> Adicionar
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="bi bi-x-circle"></i> Indisponível
+                                </button>
+                            {% endif %}
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Seção de Estatísticas -->
+<section class="py-5 bg-light position-relative overflow-hidden">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-6 fw-bold mb-3">Números que Falam por Si</h2>
+                <p class="lead text-muted">Nossa trajetória de confiança e qualidade</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-6 col-md-3">
+                <div class="text-center p-4">
+                    <div class="counter" data-target="50000">0</div>
+                    <div class="counter-label">Clientes Satisfeitos</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-center p-4">
+                    <div class="counter" data-target="15000">0</div>
+                    <div class="counter-label">Produtos Disponíveis</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-center p-4">
+                    <div class="counter" data-target="98">0</div>
+                    <div class="counter-label">% de Satisfação</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-center p-4">
+                    <div class="counter" data-target="10">0</div>
+                    <div class="counter-label">Anos de Experiência</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção de Informações Importantes -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3 class="mb-4">📋 Informações Importantes</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-prescription-bottle-alt fa-2x text-primary mb-3"></i>
+                            <h6>Medicamentos Controlados</h6>
+                            <p class="small text-muted">Vendidos apenas com receita médica válida</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-clock fa-2x text-primary mb-3"></i>
+                            <h6>Horário de Atendimento</h6>
+                            <p class="small text-muted">Segunda a Sexta: 8h às 18h<br>Sábado: 8h às 14h</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h6>Dúvidas Farmacêuticas</h6>
+                            <p class="small text-muted">Ligue (11) 1234-5678 para orientações</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimentos -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-6 fw-bold">O que nossos clientes dizem</h2>
+            <p class="lead text-muted">Confiança construída dia a dia</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-3">"Excelente atendimento e produtos de qualidade. A entrega foi super rápida!"</p>
+                        <h6 class="fw-bold">Maria Silva</h6>
+                        <small class="text-muted">Cliente desde 2023</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-3">"Farmacêutico sempre disponível para esclarecer dúvidas. Recomendo!"</p>
+                        <h6 class="fw-bold">João Santos</h6>
+                        <small class="text-muted">Cliente desde 2022</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-3">"Preços justos e site muito fácil de usar. Minha farmácia online favorita!"</p>
+                        <h6 class="fw-bold">Ana Costa</h6>
+                        <small class="text-muted">Cliente desde 2024</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animação suave para links internos
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Contador animado para estatísticas (se houver)
+function animateCounters() {
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const count = parseInt(counter.innerText);
+        const increment = target / 100;
+        
+        if (count < target) {
+            counter.innerText = Math.ceil(count + increment);
+            setTimeout(animateCounters, 20);
+        } else {
+            counter.innerText = target;
+        }
+    });
+}
+
+// Lazy loading para imagens
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+</script>
+{% endblock %}

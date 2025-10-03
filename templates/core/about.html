@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Sobre Nós - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold text-primary">Sobre Nós</h1>
+            <p class="lead">Conheça nossa história e missão</p>
+        </div>
+    </div>
+    
+    <!-- Nossa História -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-lg-6">
+            <h2 class="mb-4">Nossa História</h2>
+            <p class="lead">
+                Fundada em 2024, nossa empresa nasceu com o propósito de revolucionar 
+                a experiência de compras online no Brasil.
+            </p>
+            <p>
+                Com uma equipe dedicada e apaixonada por tecnologia e atendimento ao cliente, 
+                construímos uma plataforma que prioriza a segurança, praticidade e satisfação 
+                de nossos clientes.
+            </p>
+            <p>
+                Hoje, somos referência em e-commerce, oferecendo uma ampla variedade de produtos 
+                com qualidade garantida e preços competitivos.
+            </p>
+        </div>
+        <div class="col-lg-6 text-center">
+            <i class="fas fa-history display-1 text-primary"></i>
+        </div>
+    </div>
+    
+    <!-- Nossa Missão -->
+    <div class="row mb-5 align-items-center">
+        <div class="col-lg-6 text-center order-lg-2">
+            <i class="fas fa-bullseye display-1 text-success"></i>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+            <h2 class="mb-4">Nossa Missão</h2>
+            <p class="lead">
+                Proporcionar a melhor experiência de compra online, conectando pessoas 
+                aos produtos que desejam com segurança, rapidez e confiabilidade.
+            </p>
+            <p>
+                Acreditamos que o comércio eletrônico deve ser simples, seguro e acessível 
+                para todos. Por isso, investimos constantemente em tecnologia e inovação 
+                para oferecer a melhor experiência possível.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Nossos Valores -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-5">Nossos Valores</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <i class="fas fa-shield-alt display-4 text-primary mb-3"></i>
+                            <h5 class="card-title">Segurança</h5>
+                            <p class="card-text">
+                                Protegemos os dados de nossos clientes com as mais avançadas 
+                                tecnologias de segurança digital.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <i class="fas fa-heart display-4 text-danger mb-3"></i>
+                            <h5 class="card-title">Compromisso</h5>
+                            <p class="card-text">
+                                Nosso compromisso é com a satisfação total de nossos clientes 
+                                em cada interação.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <i class="fas fa-rocket display-4 text-warning mb-3"></i>
+                            <h5 class="card-title">Inovação</h5>
+                            <p class="card-text">
+                                Buscamos constantemente novas tecnologias e soluções para 
+                                melhorar a experiência de compra.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Números -->
+    <div class="row mb-5 bg-primary text-white p-5 rounded">
+        <div class="col-12 text-center mb-4">
+            <h2>Nossos Números</h2>
+        </div>
+        <div class="col-md-3 text-center mb-3">
+            <h3 class="display-4">100K+</h3>
+            <p>Clientes Satisfeitos</p>
+        </div>
+        <div class="col-md-3 text-center mb-3">
+            <h3 class="display-4">50K+</h3>
+            <p>Produtos Vendidos</p>
+        </div>
+        <div class="col-md-3 text-center mb-3">
+            <h3 class="display-4">99%</h3>
+            <p>Avaliações Positivas</p>
+        </div>
+        <div class="col-md-3 text-center mb-3">
+            <h3 class="display-4">24/7</h3>
+            <p>Suporte Disponível</p>
+        </div>
+    </div>
+    
+    <!-- Equipe -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-5">Nossa Equipe</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user-tie fa-2x"></i>
+                            </div>
+                            <h5>João Silva</h5>
+                            <p class="text-muted">CEO & Fundador</p>
+                            <p>Visionário e empreendedor apaixonado por tecnologia e inovação.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <div class="bg-success text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-code fa-2x"></i>
+                            </div>
+                            <h5>Maria Santos</h5>
+                            <p class="text-muted">CTO</p>
+                            <p>Especialista em tecnologia com mais de 10 anos de experiência.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="card border-0">
+                        <div class="card-body">
+                            <div class="bg-info text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <h5>Pedro Costa</h5>
+                            <p class="text-muted">Head de Atendimento</p>
+                            <p>Líder em atendimento ao cliente e satisfação do consumidor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="bg-light p-5 rounded">
+                <h3>Pronto para começar?</h3>
+                <p class="lead">Junte-se aos milhares de clientes satisfeitos!</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-shopping-cart"></i> Ver Produtos
+                </a>
+                <a href="{% url 'core:contact' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-envelope"></i> Entre em Contato
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
